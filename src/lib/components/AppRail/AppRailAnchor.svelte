@@ -7,7 +7,9 @@
 	import { getContext } from 'svelte';
 
 	// Types
-	import type { CssClasses } from '../../index.js';
+    type CssClasses = string;
+
+
 
 	// Props
 	/** Enables the active state styles when set true. */

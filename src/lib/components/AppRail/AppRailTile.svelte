@@ -7,7 +7,9 @@
 	import { getContext } from 'svelte';
 
 	// Types
-	import type { CssClasses, SvelteEvent } from '../../index.js';
+	type CssClasses = string;
+
+    type SvelteEvent<E extends Event = Event, T extends EventTarget = Element> = E & { currentTarget: EventTarget & T };
 
 	// Props
 	/**
