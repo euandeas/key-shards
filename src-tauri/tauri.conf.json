@@ -6,8 +6,8 @@
     "distDir": "../dist"
   },
   "package": {
-    "productName": "keyshards",
-    "version": "0.0.0"
+    "productName": "KeyShards",
+    "version": "0.1.0"
   },
   "tauri": {
     "allowlist": {

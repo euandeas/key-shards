@@ -1,8 +1,8 @@
 [package]
-name = "keyshards"
-version = "0.0.0"
-description = "A Tauri App"
-authors = ["you"]
+name = "KeyShards"
+version = "0.1.0"
+description = "An app utilizing Shamir's Secret Sharing Scheme to allow the secure backup of keys."
+authors = ["Euan Deas"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
