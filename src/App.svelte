@@ -1,39 +1,36 @@
 <script lang="ts">
   import Greet from './lib/Greet.svelte'
+  import AppRail from './lib/components/AppRail/AppRail.svelte'
+  import AppRailTile from './lib/components/AppRail/AppRailTile.svelte'
+  import AppRailAnchor from './lib/components/AppRail/AppRailAnchor.svelte'
+
+  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.documentElement.classList.add('dark')
+  } else {
+    document.documentElement.classList.remove('dark')
+  }
+
+  let currentTile: number = 0;
 </script>
 
-<main class="container">
-  <h1>Welcome to Tauri!</h1>
-
-  <div class="row">
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo vite" alt="Vite Logo" />
-    </a>
-    <a href="https://tauri.app" target="_blank">
-      <img src="/tauri.svg" class="logo tauri" alt="Tauri Logo" />
-    </a>
-    <a href="https://svelte.dev" target="_blank">
-      <img src="/svelte.svg" class="logo svelte" alt="Svelte Logo" />
-    </a>
-  </div>
-
-  <p>
-    Click on the Tauri, Vite, and Svelte logos to learn more.
-  </p>
-
-  <div class="row">
-    <Greet />
-  </div>
-
-
+<main>
+  <AppRail class="h-screen">
+    <!-- --- -->
+    <AppRailTile bind:group={currentTile} name="tile-1" value={0} title="tile-1">
+      <svelte:fragment slot="lead">(icon)</svelte:fragment>
+      <span>Tile 1</span>
+    </AppRailTile>
+    <AppRailTile bind:group={currentTile} name="tile-2" value={1} title="tile-2">
+      <svelte:fragment slot="lead">(icon)</svelte:fragment>
+      <span>Tile 2</span>
+    </AppRailTile>
+    <AppRailTile bind:group={currentTile} name="tile-3" value={2} title="tile-3">
+      <svelte:fragment slot="lead">(icon)</svelte:fragment>
+      <span>Tile 3</span>
+    </AppRailTile>
+    <!-- --- -->
+    <svelte:fragment slot="trail">
+      <AppRailAnchor href="/" target="_blank" title="Account">(icon)</AppRailAnchor>
+    </svelte:fragment>
+  </AppRail>
 </main>
-
-<style>
-  .logo.vite:hover {
-    filter: drop-shadow(0 0 2em #747bff);
-  }
-
-  .logo.svelte:hover {
-    filter: drop-shadow(0 0 2em #ff3e00);
-  }
-</style>

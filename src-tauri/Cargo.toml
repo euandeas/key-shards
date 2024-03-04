@@ -1,5 +1,5 @@
 [package]
-name = "KeyShards"
+name = "keyshards"
 version = "0.1.0"
 description = "An app utilizing Shamir's Secret Sharing Scheme to allow the secure backup of keys."
 authors = ["Euan Deas"]
@@ -14,6 +14,7 @@ tauri-build = { version = "1", features = [] }
 tauri = { version = "1", features = ["shell-open"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+shami_rs = { git = "https://github.com/euandeas/shami_rs" }
 
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!
