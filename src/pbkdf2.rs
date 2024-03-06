@@ -58,8 +58,8 @@ fn create_hmac_engine<M>(mnemonic: M) -> hmac::HmacEngine<sha512::Hash>
 		let mut cursor = 0;
 		for (i, word) in mnemonic.enumerate() {
 			if i > 0 {
-				ipad[cursor] ^= ' ' as u8;
-				opad[cursor] ^= ' ' as u8;
+				ipad[cursor] ^= b' ';
+				opad[cursor] ^= b' ';
 				cursor += 1;
 			}
 			for (b_i, b_h) in ipad.iter_mut().skip(cursor).zip(word.as_bytes()) {
@@ -82,8 +82,9 @@ fn create_hmac_engine<M>(mnemonic: M) -> hmac::HmacEngine<sha512::Hash>
 #[inline]
 fn u32_to_array_be(val: u32) -> [u8; 4] {
 	let mut res = [0; 4];
-	for i in 0..4 {
-		res[i] = ((val >> ((4 - i - 1) * 8)) & 0xff) as u8;
+	//for i in 0..4 {
+	for (i, item) in res.iter_mut().enumerate() {
+		*item = ((val >> ((4 - i - 1) * 8)) & 0xff) as u8;
 	}
 	res
 }
