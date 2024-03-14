@@ -32,9 +32,9 @@
 
 	// Props (tiles/anchors)
 	/** Provide classes to set the tile/anchor hover background color. */
-	export let hover: CssClasses = 'bg-primary-hover-token';
+	export let hover: CssClasses = 'hover:bg-gray-100 hover:bg-opacity-10';
 	/** Provide classes to set the tile/anchor active tile background. */
-	export let active: CssClasses = 'bg-primary-active-token';
+	export let active: CssClasses = 'bg-blue-900 bg-opacity-25';
 	/** Provide classes to set the tile/anchor vertical spacing. */
 	export let spacing: CssClasses = 'space-y-1';
 	/** Provide classes to set the tile/anchor aspect ratio. */
