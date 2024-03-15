@@ -1,8 +1,8 @@
 <script>
-    import "../app.css";
+	import '../app.css';
 
-    export const prerender = true
-    export const ssr = false
-  </script>
-  
-  <slot />
+	export const prerender = true;
+	export const ssr = false;
+</script>
+
+<slot />
