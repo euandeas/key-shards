@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Create from './lib/create.svelte';
-	import Combine from './lib/combine.svelte';
+	import Create from './lib/pages/create.svelte';
+	import Combine from './lib/pages/combine.svelte';
 	import AppRail from './lib/components/ui/apprail/apprail.svelte';
 	import AppRailTile from './lib/components/ui/apprail/apprailtile.svelte';
 	import AppRailAnchor from './lib/components/ui/apprail/apprailanchor.svelte';
