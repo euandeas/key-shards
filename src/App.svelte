@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Toaster } from './lib/components/ui/sonner';
 	import Create from './lib/pages/create.svelte';
 	import Combine from './lib/pages/combine.svelte';
 	import AppRail from './lib/components/ui/apprail/apprail.svelte';
@@ -15,6 +16,7 @@
 </script>
 
 <main>
+	<Toaster />
 	<div class="flex h-screen">
 		<AppRail class="h-screen">
 			<!-- --- -->
