@@ -14,7 +14,7 @@ tauri-build = { version = "1", features = [] }
 tauri = { version = "1", features = ["shell-open"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-shami_rs = { git = "https://github.com/euandeas/shami_rs" }
+shami_rs = { git = "https://github.com/euandeas/shami_rs", features = ["experimental"] }
 bip39 = { git = "https://github.com/euandeas/rust-bip39", features = ["all-languages", "low_ent"] }
 base64 = "0.22.0"
 

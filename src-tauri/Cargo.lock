@@ -2510,7 +2510,7 @@ dependencies = [
 [[package]]
 name = "shami_rs"
 version = "0.1.0"
-source = "git+https://github.com/euandeas/shami_rs#02ad374f418f5afc47b64b453ec4aa5203290b9c"
+source = "git+https://github.com/euandeas/shami_rs#6932e7189f731fb03647abfdd26ce96b4e819309"
 dependencies = [
  "bip39",
  "block-padding",
