@@ -34,7 +34,7 @@
 			</svelte:fragment>
 		</AppRail>
 
-		<div class="m-8 flex-1">
+		<div class="flex-1">
 			{#if currentPage === 0}
 				<Create />
 			{:else}

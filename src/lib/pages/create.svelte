@@ -21,7 +21,7 @@
 			checkedpre = false;
 		}
 
-		if (!checkedpre) {
+		if (checkedaead === true || checkedaead === false || checkedpadding === true || checkedpadding === false || checkedpre === true || checkedpre === false) {
 			share1Value = '';
 			share2Value = '';
 		}
@@ -41,7 +41,6 @@
 
 	let secret = '';
 	let isbip39 = false;
-	let secretInfo = '';
 
 	function debounce<F extends (...args: any[]) => void>(fn: F, delay: number) {
 		let timeoutId: ReturnType<typeof setTimeout> | undefined;
@@ -70,7 +69,13 @@
 			elm.textContent = '';
 			isbip39 = false;
 		}
+
+		share1Value = '';
+		share2Value = '';
 	}
+
+	let results: string[] = [];
+	let numofpredefined: number = 0;
 
 	async function generateClicked() {
 		const threshold = Number((document.getElementById('threshold') as HTMLInputElement).value);
@@ -106,30 +111,90 @@
 			return;
 		}
 
-		if (isbip39) {
-			results = await invoke('build_shares_bip', {
+		let functionToInvoke = '';
+
+		if (checkedadv) {
+			if (isbip39) {
+				if (checkedpre && checkedaead){
+					functionToInvoke = 'build_shares_bip_aead_predefined';
+				} else if (checkedpre){
+					functionToInvoke = 'build_shares_bip_predefined';
+				}
+				else if (checkedaead){
+					functionToInvoke = 'build_shares_bip_aead';
+				}
+				else{
+					functionToInvoke = 'build_shares_bip';
+				}
+			} else {
+				if (checkedpre && checkedaead){
+					functionToInvoke = 'build_shares_aead_predefined';
+				} else if (checkedpre){
+					functionToInvoke = 'build_shares_base_predefined';
+				}
+				else if (checkedaead){
+					functionToInvoke = 'build_shares_aead';
+				}
+				else{
+					functionToInvoke = 'build_shares_base';
+				}
+			}
+		} else {
+			if (isbip39) {
+				functionToInvoke = 'build_shares_bip';
+			} else {
+				functionToInvoke = 'build_shares_base';
+			}
+		}
+
+		if (checkedpre) {
+			if (share1Value === '' && share2Value === '') {
+				toast('Error', {
+					description: 'Predefined shares cannot be empty.'
+				});
+				return;
+			}
+
+			results = await invoke(functionToInvoke, {
 				secret: secret,
+				preshares: [share1Value, share2Value].filter((value) => value !== ''),
 				threshold: threshold,
-				totalshares: total_shares
+				totalshares: total_shares,
+				pad: checkedpadding
 			});
 		} else {
-			results = await invoke('build_shares_base', {
+			results = await invoke(functionToInvoke, {
 				secret: secret,
 				threshold: threshold,
-				totalshares: total_shares
+				totalshares: total_shares,
+				pad: checkedpadding
 			});
+		}
+
+		if (checkedpre && share1Value !== '' && share2Value !== '') {
+			numofpredefined = 2;
+		} else if (checkedpre && (share1Value !== '' || share2Value !== '')) {
+			numofpredefined = 1;
+		} else {
+			numofpredefined = 0;
 		}
 
 		showNewPage = !showNewPage;
 	}
 
-	let results: string[] = [];
+	async function pregenerateClicked(share: number) {
+		if (share === 1){
+			share1Value = await invoke('generate_predefined', {secret: secret, othershare: share2Value, aead: checkedaead, isbip: isbip39, ispad: checkedpadding});
+		} else if (share === 2){
+			share2Value = await invoke('generate_predefined', {secret: secret, othershare: share1Value, aead: checkedaead, isbip: isbip39, ispad: checkedpadding});
+		}
+	}
 
 	let showNewPage = false;
 </script>
 
 <div class="relative h-full overflow-y-hidden">
-	<div class="z-0 h-full select-none">
+	<div class="z-0 h-full select-none p-8">
 		<div class="mb-8 grid w-full gap-1.5">
 			<Label for="secret">Secret</Label>
 			<Textarea class="resize-none" id="secret" bind:value={secret} />
@@ -201,14 +266,14 @@
 					<div class="grid grid-cols-2 gap-4">
 						{#if selectedNumShares === '1' || selectedNumShares === '2'}
 							<div class="relative">
-								<Input id="share1" disabled class="pr-20" />
-								<Button class="absolute inset-y-0 right-0 rounded-l-none">Generate</Button>
+								<Input id="share1" disabled class="pr-20" bind:value={share1Value}/>
+								<Button class="absolute inset-y-0 right-0 rounded-l-none" on:click={() => pregenerateClicked(1)}>Generate</Button>
 							</div>
 						{/if}
 						{#if selectedNumShares === '2'}
 							<div class="relative">
-								<Input id="share2" disabled class="pr-20" />
-								<Button class="absolute inset-y-0 right-0 rounded-l-none">Generate</Button>
+								<Input id="share2" disabled class="pr-20" bind:value={share2Value}/>
+								<Button class="absolute inset-y-0 right-0 rounded-l-none" on:click={() => pregenerateClicked(2)}>Generate</Button>
 							</div>
 						{/if}
 					</div>
@@ -219,12 +284,12 @@
 		<Button class="mb-8 w-full" on:click={generateClicked}>Generate</Button>
 	</div>
 	<div
-		class={`z-1 absolute transition-all duration-1000 ease-in-out overflow-x-hidden ${showNewPage ? 'translate-y-0' : 'translate-y-full'} top-0 h-full w-full`}
+		class={`z-1 absolute overflow-x-hidden transition-all duration-1000 ease-in-out ${showNewPage ? 'translate-y-0' : 'translate-y-full'} top-0 h-full w-full p-8`}
 		style="
     background-color: hsl(var(--background) / var(--tw-bg-opacity));"
 	>
 		<button
-			class="absolute right-0 top-0 text-gray-500 hover:text-gray-700 focus:outline-none"
+			class="absolute right-0 top-0 text-gray-500 hover:text-gray-700 focus:outline-none m-6"
 			on:click={() => (showNewPage = !showNewPage)}
 		>
 			<svg
@@ -242,6 +307,6 @@
 				/>
 			</svg>
 		</button>
-		<Result {results} />
+		<Result {results} {numofpredefined} />
 	</div>
 </div>
