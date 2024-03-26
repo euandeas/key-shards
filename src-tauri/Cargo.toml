@@ -11,7 +11,7 @@ edition = "2021"
 tauri-build = { version = "1", features = [] }
 
 [dependencies]
-tauri = { version = "1", features = ["shell-open"] }
+tauri = { version = "1", features = ["shell-open", "dialog"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 shami_rs = { git = "https://github.com/euandeas/shami_rs", features = ["experimental"] }
@@ -19,6 +19,9 @@ bip39 = { git = "https://github.com/euandeas/rust-bip39", features = ["all-langu
 base64 = "0.22.0"
 sha3 = "0.10.8"
 rand_core = { version = "0.6.4", features = ["getrandom"] }
+block-padding = "0.3.3"
+pem-rfc7468 = { version = "0.7.0", features = ["alloc"] }
+opencv = "0.89.0"
 
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!

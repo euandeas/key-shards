@@ -75,6 +75,7 @@
 	}
 
 	let results: string[] = [];
+	let predefined: string[] = [];
 	let numofpredefined: number = 0;
 
 	async function generateClicked() {
@@ -147,6 +148,8 @@
 			}
 		}
 
+		predefined = [share1Value, share2Value].filter((value) => value !== '');
+
 		if (checkedpre) {
 			if (share1Value === '' && share2Value === '') {
 				toast('Error', {
@@ -157,7 +160,7 @@
 
 			results = await invoke(functionToInvoke, {
 				secret: secret,
-				preshares: [share1Value, share2Value].filter((value) => value !== ''),
+				preshares: predefined,
 				threshold: threshold,
 				totalshares: total_shares,
 				pad: checkedpadding
@@ -266,13 +269,13 @@
 					<div class="grid grid-cols-2 gap-4">
 						{#if selectedNumShares === '1' || selectedNumShares === '2'}
 							<div class="relative">
-								<Input id="share1" disabled class="pr-20" bind:value={share1Value}/>
+								<Input id="share1" disabled class="pr-20 select-text disabled:cursor-text disabled:opacity-100" bind:value={share1Value}/>
 								<Button class="absolute inset-y-0 right-0 rounded-l-none" on:click={() => pregenerateClicked(1)}>Generate</Button>
 							</div>
 						{/if}
 						{#if selectedNumShares === '2'}
 							<div class="relative">
-								<Input id="share2" disabled class="pr-20" bind:value={share2Value}/>
+								<Input id="share2" disabled class="pr-20 select-text disabled:cursor-text disabled:opacity-100" bind:value={share2Value}/>
 								<Button class="absolute inset-y-0 right-0 rounded-l-none" on:click={() => pregenerateClicked(2)}>Generate</Button>
 							</div>
 						{/if}
@@ -307,6 +310,6 @@
 				/>
 			</svg>
 		</button>
-		<Result {results} {numofpredefined} />
+		<Result {results} {numofpredefined} {predefined}/>
 	</div>
 </div>

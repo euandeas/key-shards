@@ -3,189 +3,146 @@
 
 use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _};
 use bip39::Mnemonic;
-use sha3::{Shake256, digest::{Update, ExtendableOutput, XofReader}};
-use rand_core::{OsRng, RngCore};
-use shami_rs::aead as saead;
-use shami_rs::base as sbase;
-use shami_rs::bip39 as sbip39;
+use block_padding::{Pkcs7, RawPadding};
+use opencv::{core, highgui, imgproc, objdetect, prelude::*, types, videoio, Result};
+use pem_rfc7468::LineEnding;
+use std::fs::File;
+use std::io::prelude::*;
+use tauri::api::dialog::FileDialogBuilder;
 
-macro_rules! build_shares {
-    ($func:path, $secret:expr, $threshold:expr, $totalshares:expr, $pad:expr) => {{
-        $func($secret.as_bytes(), $threshold as usize, $totalshares as usize, $pad)
-            .unwrap()
-            .into_iter()
-            .map(|bytes| URL_SAFE_NO_PAD.encode(bytes))
-            .collect()
-    }};
-    ($func:path, $secret:expr, $preshares:expr, $threshold:expr, $totalshares:expr, $pad:expr) => {{
-        $func($secret.as_bytes(), $preshares, $threshold as usize, $totalshares as usize, $pad)
-            .unwrap()
-            .into_iter()
-            .map(|bytes| URL_SAFE_NO_PAD.encode(bytes))
-            .collect()
-    }};
-}
-
-fn hash_preshares(preshares: Vec<String>, secret: &str, aead: bool, isbip: bool, ispad: bool) -> Vec<Vec<u8>> {
-    let sharelen: usize;
-    if aead {
-        sharelen = 32 + 1;
-    } else if isbip {
-        let m = match Mnemonic::parse_normalized(secret) {
-            Ok(m) => m,
-            Err(_) => return Vec::new(), // Return an empty vector if parsing fails
-        };
-        sharelen = m.to_entropy().len() + 1;
-    } else {
-        if ispad{
-            sharelen = (secret.len() + 31) / 32 * 32;
-        }
-        else {
-            sharelen = secret.len() + 1;
-        }
-    }
-
-    let mut preshares_hashed = Vec::new();
-    for share in &preshares {
-        let shareparsed = match Mnemonic::parse_normalized(share) {
-            Ok(m) => m.to_entropy(),
-            Err(_) => return Vec::new(), // Return an empty vector if parsing fails
-        };
-
-        let mut hasher = Shake256::default();
-        hasher.update(&shareparsed);
-        let mut reader = hasher.finalize_xof();
-        let mut share_hashed = vec![0u8; sharelen];
-        reader.read(&mut share_hashed);
-        println!("{:}", URL_SAFE_NO_PAD.encode(&share_hashed));
-        preshares_hashed.push(share_hashed);
-    }
-
-    preshares_hashed
-}
-
-#[tauri::command]
-fn build_shares_base(secret: &str, threshold: u64, totalshares: u64, pad: bool) -> Vec<String> {
-    build_shares!(sbase::build_shares, secret, threshold, totalshares, pad)
-}
-
-#[tauri::command]
-fn build_shares_bip(secret: &str, threshold: u64, totalshares: u64, pad: bool) -> Vec<String> {
-    build_shares!(sbip39::build_shares, secret, threshold, totalshares, pad)
-}
-
-#[tauri::command]
-fn build_shares_base_predefined(secret: &str, preshares: Vec<String>, threshold: u64, totalshares: u64, pad: bool) -> Vec<String> {
-    let hashedpreshares = hash_preshares(preshares, secret, false, false, pad);
-
-    build_shares!(sbase::build_shares_predefined, secret, hashedpreshares, threshold, totalshares, pad)
-}
-
-#[tauri::command]
-fn build_shares_aead(secret: &str, threshold: u64, totalshares: u64, pad: bool) -> Vec<String> {
-    build_shares!(saead::build_shares, secret, threshold, totalshares, pad)
-}
-
-#[tauri::command]
-fn build_shares_aead_predefined(secret: &str, preshares: Vec<String>, threshold: u64, totalshares: u64, pad: bool) -> Vec<String> {
-    let hashedpreshares = hash_preshares(preshares, secret, true, false, pad);
-
-    build_shares!(saead::build_shares_predefined, secret, hashedpreshares, threshold, totalshares, pad)
-}
-
-#[tauri::command]
-fn build_shares_bip_aead(secret: &str, threshold: u64, totalshares: u64, pad: bool) -> Vec<String> {
-    build_shares!(sbip39::build_shares_aead, secret, threshold, totalshares, pad)
-}
-
-#[tauri::command]
-fn build_shares_bip_predefined(secret: &str, preshares: Vec<String>, threshold: u64, totalshares: u64, pad: bool) -> Vec<String> {
-    let hashedpreshares = hash_preshares(preshares, secret, false, true, pad);
-
-    build_shares!(sbip39::build_shares_predefined, secret, hashedpreshares, threshold, totalshares, pad)
-}
-
-#[tauri::command]
-fn build_shares_bip_aead_predefined(secret: &str, preshares: Vec<String>, threshold: u64, totalshares: u64, pad: bool) -> Vec<String> {
-    let hashedpreshares = hash_preshares(preshares, secret, true, true, pad);
-
-    build_shares!(sbip39::build_shares_aead_predefined, secret, hashedpreshares, threshold, totalshares, pad)
-}
+#[macro_use]
+mod building_shares;
 
 #[tauri::command]
 fn verify_mnemonic(mnemonic: &str) -> bool {
     Mnemonic::parse_normalized(mnemonic).is_ok()
 }
 
-#[tauri::command]
-fn generate_predefined(secret: &str, othershare: &str, aead: bool, isbip: bool, ispad: bool) -> String {
-    let sharelen;
-    if aead {
-        sharelen = 32 + 1;
-    }
-    else if isbip {
-        let m = match Mnemonic::parse_normalized(secret) {
-            Ok(m) => m,
-            Err(_) => return "".to_string(),
-        };
-        sharelen = m.to_entropy().len() + 1;
-    }
-    else {
-        if ispad{
-            sharelen = (secret.len() + 31) / 32 * 32;
-        }
-        else {
-            sharelen = secret.len() + 1;
-        }
+fn pkcs7_pad_bip(msg: &[u8]) -> Vec<u8> {
+    let len = msg.len();
+    let block_len = (((len * 8) + 31) / 32 * 32) / 8;
+
+    if block_len == len {
+        return msg.to_vec();
     }
 
-    let mut othershare_hashed = vec![0u8; sharelen];
-
-    if othershare.len() != 0 {
-        let others = match Mnemonic::parse_normalized(othershare) {
-            Ok(m) => m.to_entropy(),
-            Err(_) => return "".to_string(),
-        };
-        
-        let mut hasher = Shake256::default();
-        hasher.update(&others);
-        let mut reader = hasher.finalize_xof();
-        reader.read(&mut othershare_hashed);
-    }
-
-    let mut share = vec![0u8; 4];
-    loop {
-        OsRng.fill_bytes(&mut share);
-       
-        let mut hasher = Shake256::default();
-        hasher.update(&share);
-        let mut reader = hasher.finalize_xof();
-        let mut share_hashed = vec![0u8; sharelen];
-        reader.read(&mut share_hashed);
-
-        if share_hashed[0] == 0 || othershare_hashed[0] == share_hashed[0] {
-            continue;
-        }
-        break;
-    }
-
-    Mnemonic::from_entropy(&share).unwrap().to_string()
+    let mut block = vec![0; block_len];
+    block[..len].copy_from_slice(msg);
+    Pkcs7::raw_pad(block.as_mut_slice(), len);
+    block
 }
 
+fn pkcs7_unpad_bip(input: Vec<u8>) -> Vec<u8> {
+    match Pkcs7::raw_unpad(input.as_slice()) {
+        Ok(v) => v.to_vec(),
+        Err(_) => input.to_vec(),
+    }
+}
+
+#[tauri::command]
+fn calculate_bip39(base64: &str) -> String {
+    let mut bytes = URL_SAFE_NO_PAD.decode(base64.as_bytes()).unwrap();
+
+    if (bytes.len() * 8) % 32 != 0 {
+        bytes = pkcs7_pad_bip(bytes.as_slice());
+    }
+
+    Mnemonic::from_entropy(&bytes).unwrap().to_string()
+}
+
+#[tauri::command]
+fn exportaspem(base64: &str) {
+    let share = base64.to_string();
+    FileDialogBuilder::new()
+        .add_filter("PEM", &["pem"])
+        .set_file_name("keyshard.pem")
+        .save_file(move |file_path| {
+            if let Some(path) = file_path {
+                let mut file = match File::create(path) {
+                    Ok(f) => f,
+                    Err(_) => return,
+                };
+
+                let encoded_pem = match pem_rfc7468::encode_string(
+                    "KEY SHARD",
+                    LineEnding::default(),
+                    share.as_bytes(),
+                ) {
+                    Ok(pem) => pem,
+                    Err(_) => return,
+                };
+
+                file.write_all(encoded_pem.as_bytes()).unwrap();
+            }
+        });
+}
+
+#[tauri::command]
+fn exportasqr(base64: &str) {
+    let share = base64.to_string();
+    FileDialogBuilder::new()
+        .add_filter("JPEG Image", &["jpg", "jpeg"])
+        .set_file_name("keyshard.jpg")
+        .save_file(move |file_path| {
+            if let Some(path) = file_path {
+                let mut qr_encoder = match objdetect::QRCodeEncoder::create_def() {
+                    Ok(e) => e,
+                    Err(_) => return,
+                };
+
+                let mut qr_code = Mat::default();
+                match qr_encoder.encode(share.as_str(), &mut qr_code) {
+                    Ok(_) => (),
+                    Err(_) => return,
+                };
+
+                let mut resized_qr_code = Mat::default();
+                match opencv::imgproc::resize(
+                    &qr_code,  // Source image
+                    &mut resized_qr_code,  // Destination image
+                    opencv::core::Size { width: 800, height: 800 }, // New dimensions
+                    0.0, // No scaling factor
+                    0.0, // No scaling factor
+                    opencv::imgproc::INTER_NEAREST, // Interpolation method
+                ) {
+                    Ok(_) => (),
+                    Err(_) => return,
+                };
+                
+
+                let truepath = match path.to_str() {
+                    Some(p) => p,
+                    None => return,
+                };
+
+                let _ = opencv::imgcodecs::imwrite(truepath, &resized_qr_code, &opencv::types::VectorOfi32::new());
+            }
+        });
+}
+
+#[tauri::command]
+fn bytelength(base64: &str) -> usize {
+    let bytes = URL_SAFE_NO_PAD.decode(base64.as_bytes()).unwrap();
+    return bytes.len();
+}
 
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             verify_mnemonic,
-            build_shares_base,
-            build_shares_bip,
-            build_shares_base_predefined,
-            build_shares_aead,
-            build_shares_aead_predefined,
-            build_shares_bip_aead,
-            build_shares_bip_predefined,
-            build_shares_bip_aead_predefined,
-            generate_predefined
+            calculate_bip39,
+            exportaspem,
+            exportasqr,
+            bytelength,
+            building_shares::build_shares_base,
+            building_shares::build_shares_bip,
+            building_shares::build_shares_base_predefined,
+            building_shares::build_shares_aead,
+            building_shares::build_shares_aead_predefined,
+            building_shares::build_shares_bip_aead,
+            building_shares::build_shares_bip_predefined,
+            building_shares::build_shares_bip_aead_predefined,
+            building_shares::generate_predefined
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
