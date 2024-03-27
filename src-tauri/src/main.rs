@@ -52,7 +52,8 @@ fn calculate_bip39(base64: &str) -> String {
 
 #[tauri::command]
 fn exportaspem(base64: &str) {
-    let share = base64.to_string();
+    let share = URL_SAFE_NO_PAD.decode(base64.as_bytes()).unwrap();
+    
     FileDialogBuilder::new()
         .add_filter("PEM", &["pem"])
         .set_file_name("keyshard.pem")
@@ -66,7 +67,7 @@ fn exportaspem(base64: &str) {
                 let encoded_pem = match pem_rfc7468::encode_string(
                     "KEY SHARD",
                     LineEnding::default(),
-                    share.as_bytes(),
+                    share.as_slice(),
                 ) {
                     Ok(pem) => pem,
                     Err(_) => return,
