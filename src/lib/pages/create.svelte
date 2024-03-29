@@ -21,7 +21,14 @@
 			checkedpre = false;
 		}
 
-		if (checkedaead === true || checkedaead === false || checkedpadding === true || checkedpadding === false || checkedpre === true || checkedpre === false) {
+		if (
+			checkedaead === true ||
+			checkedaead === false ||
+			checkedpadding === true ||
+			checkedpadding === false ||
+			checkedpre === true ||
+			checkedpre === false
+		) {
 			share1Value = '';
 			share2Value = '';
 		}
@@ -116,27 +123,23 @@
 
 		if (checkedadv) {
 			if (isbip39) {
-				if (checkedpre && checkedaead){
+				if (checkedpre && checkedaead) {
 					functionToInvoke = 'build_shares_bip_aead_predefined';
-				} else if (checkedpre){
+				} else if (checkedpre) {
 					functionToInvoke = 'build_shares_bip_predefined';
-				}
-				else if (checkedaead){
+				} else if (checkedaead) {
 					functionToInvoke = 'build_shares_bip_aead';
-				}
-				else{
+				} else {
 					functionToInvoke = 'build_shares_bip';
 				}
 			} else {
-				if (checkedpre && checkedaead){
+				if (checkedpre && checkedaead) {
 					functionToInvoke = 'build_shares_aead_predefined';
-				} else if (checkedpre){
+				} else if (checkedpre) {
 					functionToInvoke = 'build_shares_base_predefined';
-				}
-				else if (checkedaead){
+				} else if (checkedaead) {
 					functionToInvoke = 'build_shares_aead';
-				}
-				else{
+				} else {
 					functionToInvoke = 'build_shares_base';
 				}
 			}
@@ -186,10 +189,22 @@
 	}
 
 	async function pregenerateClicked(share: number) {
-		if (share === 1){
-			share1Value = await invoke('generate_predefined', {secret: secret, othershare: share2Value, aead: checkedaead, isbip: isbip39, ispad: checkedpadding});
-		} else if (share === 2){
-			share2Value = await invoke('generate_predefined', {secret: secret, othershare: share1Value, aead: checkedaead, isbip: isbip39, ispad: checkedpadding});
+		if (share === 1) {
+			share1Value = await invoke('generate_predefined', {
+				secret: secret,
+				othershare: share2Value,
+				aead: checkedaead,
+				isbip: isbip39,
+				ispad: checkedpadding
+			});
+		} else if (share === 2) {
+			share2Value = await invoke('generate_predefined', {
+				secret: secret,
+				othershare: share1Value,
+				aead: checkedaead,
+				isbip: isbip39,
+				ispad: checkedpadding
+			});
 		}
 	}
 
@@ -269,14 +284,30 @@
 					<div class="grid grid-cols-2 gap-4">
 						{#if selectedNumShares === '1' || selectedNumShares === '2'}
 							<div class="relative">
-								<Input id="share1" disabled class="pr-20 select-text disabled:cursor-text disabled:opacity-100" bind:value={share1Value}/>
-								<Button class="absolute inset-y-0 right-0 rounded-l-none" on:click={() => pregenerateClicked(1)}>Generate</Button>
+								<Input
+									id="share1"
+									disabled
+									class="select-text pr-20 disabled:cursor-text disabled:opacity-100"
+									bind:value={share1Value}
+								/>
+								<Button
+									class="absolute inset-y-0 right-0 rounded-l-none"
+									on:click={() => pregenerateClicked(1)}>Generate</Button
+								>
 							</div>
 						{/if}
 						{#if selectedNumShares === '2'}
 							<div class="relative">
-								<Input id="share2" disabled class="pr-20 select-text disabled:cursor-text disabled:opacity-100" bind:value={share2Value}/>
-								<Button class="absolute inset-y-0 right-0 rounded-l-none" on:click={() => pregenerateClicked(2)}>Generate</Button>
+								<Input
+									id="share2"
+									disabled
+									class="select-text pr-20 disabled:cursor-text disabled:opacity-100"
+									bind:value={share2Value}
+								/>
+								<Button
+									class="absolute inset-y-0 right-0 rounded-l-none"
+									on:click={() => pregenerateClicked(2)}>Generate</Button
+								>
 							</div>
 						{/if}
 					</div>
@@ -292,7 +323,7 @@
     background-color: hsl(var(--background) / var(--tw-bg-opacity));"
 	>
 		<button
-			class="absolute right-0 top-0 text-gray-500 hover:text-gray-700 focus:outline-none m-6"
+			class="absolute right-0 top-0 m-6 text-gray-500 hover:text-gray-700 focus:outline-none"
 			on:click={() => (showNewPage = !showNewPage)}
 		>
 			<svg
@@ -310,6 +341,6 @@
 				/>
 			</svg>
 		</button>
-		<Result {results} {numofpredefined} {predefined}/>
+		<Result {results} {numofpredefined} {predefined} />
 	</div>
 </div>
