@@ -11,7 +11,7 @@
 
 	$: {
 		if (results.length === 0 || results.length !== 0) {
-			resultasb64 = results;
+			resultasb64 = [...results];
 			resultsasbip = [];
 
 			for (let i = 0; i < results.length; i++) {
@@ -45,10 +45,10 @@
 	async function toggleBIP(i: number) {
 		const bipButton = document.getElementById(`bipbutton${i}`) as HTMLButtonElement;
 
-		if (bipButton.textContent == 'BIP') {
+		if (bipButton.textContent === 'BIP') {
 			bipButton.textContent = 'Base64';
 			let temp = resultasb64[i];
-			if (resultsasbip[i] == undefined) {
+			if (resultsasbip[i] === undefined) {
 				resultsasbip[i] = await invoke('calculate_bip39', { base64: temp });
 			}
 			resultasb64[i] = resultsasbip[i];

@@ -5,7 +5,7 @@
 	import { Input } from '../components/ui/input';
 	import { Checkbox } from '../components/ui/checkbox';
 	import { Button } from '../components/ui/button';
-	import Result from '../pages/result.svelte';
+	import Shares from './shares.svelte';
 	import * as Select from '../components/ui/select';
 	import { invoke } from '@tauri-apps/api/tauri';
 
@@ -340,6 +340,6 @@
 				/>
 			</svg>
 		</button>
-		<Result {results} {numofpredefined} {predefined} />
+		<Shares {results} {numofpredefined} {predefined} />
 	</div>
 </div>

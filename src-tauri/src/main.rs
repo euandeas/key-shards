@@ -10,6 +10,8 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
 use tauri::api::dialog::{blocking, FileDialogBuilder};
+use std::collections::HashSet;
+use std::str::from_utf8;
 
 #[macro_use]
 mod building_shares;
@@ -45,15 +47,22 @@ fn calculate_bip39(base64: &str) -> String {
     Mnemonic::from_entropy(&bytes).unwrap().to_string()
 }
 
+fn pkcs7_unpad(input: Vec<u8>) -> Vec<u8> {
+    match Pkcs7::raw_unpad(input.as_slice()) {
+        Ok(v) => v.to_vec(),
+        Err(_) => input.to_vec(),
+    }
+}
+
 #[tauri::command]
-// bip, short, unable to decode
-fn check_shares(list: Vec<String>) -> Vec<(bool, bool, bool)> {
+// bip, short, unable to decode, identical
+fn check_shares(list: Vec<String>) -> Vec<(bool, bool, bool, bool)> {
     let mut shares_bytes = vec![vec![]; list.len()];
-    let mut shares_props = vec![(false, false, false); list.len()];
+    let mut shares_props = vec![(false, false, false, false); list.len()];
     for (i, share) in list.iter().enumerate() {
         match Mnemonic::parse_normalized(share.as_str()) {
             Ok(m) => {
-                shares_bytes[i] = m.to_entropy().to_vec();
+                shares_bytes[i] = pkcs7_unpad(m.to_entropy().to_vec());
                 shares_props[i].0 = true;
             }
             Err(_) => match URL_SAFE_NO_PAD.decode(share) {
@@ -71,13 +80,32 @@ fn check_shares(list: Vec<String>) -> Vec<(bool, bool, bool)> {
         .max()
         .unwrap_or(0);
 
+    let mut unique_shares: HashSet<Vec<u8>> = HashSet::new();
+
     for (i, share) in shares_bytes.iter_mut().enumerate() {
         if share.len() < longest {
             shares_props[i].1 = true;
         }
+        
+        if unique_shares.contains(share) {
+            shares_props[i].3 = true;
+        } else {
+            unique_shares.insert(share.to_vec());
+        }
     }
 
     shares_props
+}
+
+#[tauri::command]
+fn tryutf8tomnemonic(utf: &str) -> String {
+    match from_utf8(utf.as_bytes()) {
+        Ok(s) => match Mnemonic::from_entropy(s.as_bytes()){
+            Ok(m) => m.to_string(),
+            Err(_) => "".to_string(),
+        },
+        Err(_) => "".to_string()
+    }
 }
 
 #[tauri::command]
@@ -314,6 +342,7 @@ fn main() {
             scanqr,
             uploadfile,
             check_shares,
+            tryutf8tomnemonic,
             building_shares::build_shares_base,
             building_shares::build_shares_bip,
             building_shares::build_shares_base_predefined,

@@ -2,9 +2,11 @@
 	import { invoke } from '@tauri-apps/api/tauri';
 	import { Button } from '../components/ui/button';
 	import { Input } from '../components/ui/input';
+	import Secret from './secret.svelte';
 	import { toast } from 'svelte-sonner';
 
 	let shares: string[] = [''];
+	let secret = '';
 
 	function addShare() {
 		shares = [...shares, ''];
@@ -60,17 +62,17 @@
 
 	async function validateShares() {
 		let sharestrimmed = shares.map((str) => str.trim());
-		let properties: [boolean, boolean, boolean][] = await invoke('check_shares', {
+		let properties: [boolean, boolean, boolean, boolean][] = await invoke('check_shares', {
 			list: sharestrimmed
 		});
-		console.log(properties);
 		for (let i = 0; i < sharestrimmed.length; i++) {
 			let elm = document.getElementById(`shareinfo${i}`);
 			if (sharestrimmed[i] !== '' && elm) {
-				let prop = properties[i] as [boolean, boolean, boolean];
-				let [bip, short, valid] = prop;
+				let [bip, short, valid, ident] = properties[i] as [boolean, boolean, boolean, boolean];
 				if (bip && short) {
 					elm.textContent = 'Short Share Detected';
+				} else if (ident){
+					elm.textContent = 'Identical Share Detected';
 				} else if (bip) {
 					elm.textContent = 'BIP-39 Mnemonic Detected';
 				} else if (short || valid) {
@@ -86,9 +88,24 @@
 
 	async function combine() {
 		let sharestrimmed = shares.map((str) => str.trim());
+		if (sharestrimmed.some((str) => str === '')) {
+			toast('Error', {
+				description: 'Cant have empty shares'
+			});
+			return;
+		}
+
 		await invoke('build_secret', { list: sharestrimmed })
 			.then((res) => {
-				console.log(res as string);
+				if (!(res as string).trim().replace(/^\0+/, '').replace(/\0+$/, '')){
+					toast('Error', {
+						description: "Invalid Secret Generated"
+					});
+					return;
+				}
+				
+				secret = res as string;
+				showNewPage = !showNewPage;
 			})
 			.catch((err) => {
 				toast('Error', {
@@ -96,39 +113,69 @@
 				});
 			});
 	}
+
+	let showNewPage = false;
 </script>
 
-<div class="relative h-full">
-	<div class="h-full overflow-y-auto p-8">
-		{#each shares as share, i}
-			<div class="mb-6">
-				<Input class="" bind:value={share} />
-				<p class="mb-2 text-xs text-green-500 text-opacity-80" id="shareinfo{i}" />
-				<div class="flex w-full">
-					<Button
-						id="uploadbutton{i}"
-						class="w-full rounded-e-none px-4 py-2"
-						on:click={() => upload(i)}>Upload</Button
-					>
-					<Button
-						id="scanbutton{i}"
-						class="mr-2 w-full rounded-s-none px-4 py-2"
-						on:click={() => scanqr(i)}>Scan</Button
-					>
-					<Button class="w-18" on:click={() => removeShare(i)}>-</Button>
+<div class="relative h-full overflow-y-hidden">
+	<div class="relative h-full">
+		<div class="h-full overflow-y-auto p-8">
+			{#each shares as share, i}
+				<div class="mb-6">
+					<Input class="" bind:value={share} />
+					<p class="mb-2 text-xs text-yellow-500 text-opacity-80" id="shareinfo{i}" />
+					<div class="flex w-full">
+						<Button
+							id="uploadbutton{i}"
+							class="w-full rounded-e-none px-4 py-2"
+							on:click={() => upload(i)}>Upload</Button
+						>
+						<Button
+							id="scanbutton{i}"
+							class="mr-2 w-full rounded-s-none px-4 py-2"
+							on:click={() => scanqr(i)}>Scan</Button
+						>
+						<Button class="w-18" on:click={() => removeShare(i)}>-</Button>
+					</div>
 				</div>
-			</div>
-		{/each}
-		<Button class="w-full" on:click={addShare}>+</Button>
-	</div>
-	<div
-		class="absolute bottom-0 w-full p-8"
-		style="background-image: linear-gradient(
+			{/each}
+			<Button class="w-full" on:click={addShare}>+</Button>
+		</div>
+		<div
+			class="absolute bottom-0 w-full p-8"
+			style="background-image: linear-gradient(
 			to top,
 			hsl(var(--background) / var(--tw-bg-opacity)) 85%,
 			hsl(var(--background) / calc(var(--tw-bg-opacity) * 0))
 		  );"
+		>
+			<Button class="w-full" on:click={combine}>Combine</Button>
+		</div>
+	</div>
+	<div
+		class={`z-1 absolute overflow-x-hidden transition-all duration-1000 ease-in-out ${showNewPage ? 'translate-y-0' : 'translate-y-full'} top-0 h-full w-full p-8`}
+		style="
+    background-color: hsl(var(--background) / var(--tw-bg-opacity));"
 	>
-		<Button class="w-full" on:click={combine}>Combine</Button>
+		<button
+			class="absolute right-0 top-0 m-6 text-gray-500 hover:text-gray-700 focus:outline-none"
+			on:click={() => (showNewPage = !showNewPage)}
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-6 w-6"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+			>
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					stroke-width="2"
+					d="M6 18L18 6M6 6l12 12"
+				/>
+			</svg>
+		</button>
+		<Secret {secret} />
 	</div>
 </div>
