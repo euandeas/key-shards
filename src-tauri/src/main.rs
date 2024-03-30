@@ -34,13 +34,6 @@ fn pkcs7_pad_bip(msg: &[u8]) -> Vec<u8> {
     block
 }
 
-fn pkcs7_unpad(input: Vec<u8>) -> Vec<u8> {
-    match Pkcs7::raw_unpad(input.as_slice()) {
-        Ok(v) => v.to_vec(),
-        Err(_) => input.to_vec(),
-    }
-}
-
 #[tauri::command]
 fn calculate_bip39(base64: &str) -> String {
     let mut bytes = URL_SAFE_NO_PAD.decode(base64.as_bytes()).unwrap();
@@ -54,44 +47,43 @@ fn calculate_bip39(base64: &str) -> String {
 
 #[tauri::command]
 // bip, short, unable to decode
-fn check_shares(list: Vec<String>) -> Vec<(bool, bool, bool)>{
+fn check_shares(list: Vec<String>) -> Vec<(bool, bool, bool)> {
     let mut shares_bytes = vec![vec![]; list.len()];
     let mut shares_props = vec![(false, false, false); list.len()];
     for (i, share) in list.iter().enumerate() {
-        match Mnemonic::parse_normalized(share.as_str()){
-            Ok(m) => 
-            {
+        match Mnemonic::parse_normalized(share.as_str()) {
+            Ok(m) => {
                 shares_bytes[i] = m.to_entropy().to_vec();
                 shares_props[i].0 = true;
-            },
+            }
             Err(_) => match URL_SAFE_NO_PAD.decode(share) {
                 Ok(b) => {
                     shares_bytes[i] = b;
-                },
+                }
                 Err(_) => shares_props[i].2 = true,
-            }
+            },
         }
     }
 
     let longest = shares_bytes
-    .iter()
-    .map(|element| element.len())
-    .max()
-    .unwrap_or(0);
+        .iter()
+        .map(|element| element.len())
+        .max()
+        .unwrap_or(0);
 
     for (i, share) in shares_bytes.iter_mut().enumerate() {
         if share.len() < longest {
             shares_props[i].1 = true;
         }
     }
-    
+
     shares_props
 }
 
 #[tauri::command]
 fn exportaspem(base64: &str) {
     let share = URL_SAFE_NO_PAD.decode(base64.as_bytes()).unwrap();
-    
+
     FileDialogBuilder::new()
         .add_filter("PEM Files", &["pem", "key"])
         .set_file_name("keyshard.pem")
@@ -137,71 +129,82 @@ fn exportasqr(base64: &str) {
 
                 let mut resized_qr_code = Mat::default();
                 match opencv::imgproc::resize(
-                    &qr_code,  // Source image
-                    &mut resized_qr_code,  // Destination image
-                    opencv::core::Size { width: 800, height: 800 }, // New dimensions
-                    0.0, // No scaling factor
-                    0.0, // No scaling factor
+                    &qr_code,             // Source image
+                    &mut resized_qr_code, // Destination image
+                    opencv::core::Size {
+                        width: 800,
+                        height: 800,
+                    }, // New dimensions
+                    0.0,                  // No scaling factor
+                    0.0,                  // No scaling factor
                     opencv::imgproc::INTER_NEAREST, // Interpolation method
                 ) {
                     Ok(_) => (),
                     Err(_) => return,
                 };
-                
 
                 let truepath = match path.to_str() {
                     Some(p) => p,
                     None => return,
                 };
 
-                let _ = opencv::imgcodecs::imwrite(truepath, &resized_qr_code, &opencv::types::VectorOfi32::new());
+                let _ = opencv::imgcodecs::imwrite(
+                    truepath,
+                    &resized_qr_code,
+                    &opencv::types::VectorOfi32::new(),
+                );
             }
         });
 }
 
 #[tauri::command]
 fn scanqr() -> Result<String, String> {
-    let qr_detector = match objdetect::QRCodeDetector::default(){
+    let qr_detector = match objdetect::QRCodeDetector::default() {
         Ok(d) => d,
         Err(_) => return Err("QR Detection Error".to_string()),
     };
     let mut res = types::VectorOfPoint::new();
-    let mut camera = match videoio::VideoCapture::new(0, videoio::CAP_ANY){
+    let mut camera = match videoio::VideoCapture::new(0, videoio::CAP_ANY) {
         Ok(d) => d,
         Err(_) => return Err("Camera Error".to_string()),
     };
     let mut img = Mat::default();
     let mut recqr = Mat::default();
-    match highgui::named_window("QR Capture", highgui::WINDOW_AUTOSIZE | highgui::WINDOW_GUI_NORMAL){
+    match highgui::named_window(
+        "QR Capture",
+        highgui::WINDOW_AUTOSIZE | highgui::WINDOW_GUI_NORMAL,
+    ) {
         Ok(_) => (),
         Err(_) => return Err("GUI Error".to_string()),
     };
     loop {
-        match camera.read(&mut img){
+        match camera.read(&mut img) {
             Ok(_) => (),
             Err(_) => return Err("Camera Error".to_string()),
         };
-        let ret = match qr_detector.detect_and_decode(&img, &mut res, &mut recqr){
+        let ret = match qr_detector.detect_and_decode(&img, &mut res, &mut recqr) {
             Ok(r) => r,
             Err(_) => return Err("QR Detection Error".to_string()),
         };
         let s = String::from_utf8_lossy(&ret);
-        
+
         if !ret.is_empty() {
             highgui::destroy_window("QR Capture").unwrap();
             return Ok(s.to_string());
         }
 
-        match highgui::imshow("QR Capture", &img){
+        match highgui::imshow("QR Capture", &img) {
             Ok(_) => (),
             Err(_) => return Err("GUI Error".to_string()),
         };
 
         let _ = highgui::wait_key(1);
-        
-        match highgui::get_window_property("QR Capture", highgui::WND_PROP_VISIBLE){
-            Ok(v) => if v == 0.0 {
-                break;
+
+        match highgui::get_window_property("QR Capture", highgui::WND_PROP_VISIBLE) {
+            Ok(v) => {
+                if v == 0.0 {
+                    break;
+                }
             }
             Err(_) => return Err("GUI Error".to_string()),
         };
@@ -209,13 +212,12 @@ fn scanqr() -> Result<String, String> {
     Err("No QR code detected".to_string())
 }
 
-
-fn handle_image_file(path: &str) -> Result<String, String>{
-    let image = match imgcodecs::imread(path, imgcodecs::IMREAD_ANYCOLOR){
+fn handle_image_file(path: &str) -> Result<String, String> {
+    let image = match imgcodecs::imread(path, imgcodecs::IMREAD_ANYCOLOR) {
         Ok(i) => i,
         Err(_) => return Err("Unable To Read Image".to_string()),
     };
-    let qr_detector = match objdetect::QRCodeDetector::default(){
+    let qr_detector = match objdetect::QRCodeDetector::default() {
         Ok(d) => d,
         Err(_) => return Err("QR Detection Error".to_string()),
     };
@@ -223,7 +225,7 @@ fn handle_image_file(path: &str) -> Result<String, String>{
     let mut res = types::VectorOfPoint::new();
     let mut recqr = Mat::default();
 
-    let ret = match qr_detector.detect_and_decode(&image, &mut res, &mut recqr){
+    let ret = match qr_detector.detect_and_decode(&image, &mut res, &mut recqr) {
         Ok(r) => r,
         Err(_) => return Err("QR Detection Error".to_string()),
     };
@@ -236,19 +238,19 @@ fn handle_image_file(path: &str) -> Result<String, String>{
     Err("No QR code detected".to_string())
 }
 
-fn handle_pem_file(path: &str) -> Result<String, String>{
+fn handle_pem_file(path: &str) -> Result<String, String> {
     let mut contents: Vec<u8> = vec![];
     let mut file = match File::open(path) {
         Ok(f) => f,
         Err(_) => return Err("Unable To Read File".to_string()),
     };
-    
+
     match file.read_to_end(&mut contents) {
         Ok(_) => (),
         Err(_) => return Err("Unable To Read File".to_string()),
     };
 
-    let (type_label, data) = match pem_rfc7468::decode_vec(contents.as_slice()){
+    let (type_label, data) = match pem_rfc7468::decode_vec(contents.as_slice()) {
         Ok((t, d)) => (t, d),
         Err(_) => return Err("Unable To Decode PEM".to_string()),
     };
@@ -262,11 +264,11 @@ fn handle_pem_file(path: &str) -> Result<String, String>{
 }
 
 #[tauri::command]
-async fn uploadfile() -> Result<String, String>{
+async fn uploadfile() -> Result<String, String> {
     let file_path = blocking::FileDialogBuilder::new()
-    .add_filter("PEM Files", &["pem", "key", "txt"])
-    .add_filter("Image Files", &["jpg", "png", "bmp"])
-    .pick_file();
+        .add_filter("PEM Files", &["pem", "key", "txt"])
+        .add_filter("Image Files", &["jpg", "png", "bmp"])
+        .pick_file();
     if let Some(path) = file_path {
         let extension = Path::new(&path)
             .extension()
@@ -320,7 +322,8 @@ fn main() {
             building_shares::build_shares_bip_aead,
             building_shares::build_shares_bip_predefined,
             building_shares::build_shares_bip_aead_predefined,
-            building_shares::generate_predefined
+            building_shares::generate_predefined,
+            building_secret::build_secret
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

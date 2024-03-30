@@ -40,7 +40,6 @@
 
 	async function handleNumSharesChange(value: string) {
 		selectedNumShares = value;
-
 		if (value === '1') {
 			share2Value = '';
 		}

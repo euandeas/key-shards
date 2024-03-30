@@ -16,24 +16,27 @@
 
 			for (let i = 0; i < results.length; i++) {
 				const bipButton = document.getElementById(`bipbutton${i}`) as HTMLButtonElement;
+				const fileButton = document.getElementById(`filebutton${i}`) as HTMLButtonElement;
+				const qrButton = document.getElementById(`qrbutton${i}`) as HTMLButtonElement;
 				if (bipButton != null) {
 					bipButton.textContent = 'BIP';
+					bipButton.disabled = false;
+					fileButton.disabled = false;
+					qrButton.disabled = false;
 				}
 				bytelength(i);
 			}
 
-			if (numofpredefined > 0) {
-				for (let i = 0; i < numofpredefined; i++) {
-					const bipButton = document.getElementById(`bipbutton${i}`) as HTMLButtonElement;
-					const fileButton = document.getElementById(`filebutton${i}`) as HTMLButtonElement;
-					const qrButton = document.getElementById(`qrbutton${i}`) as HTMLButtonElement;
-					if (bipButton != null) {
-						resultasb64[i] = predefined[i];
-						bipButton.textContent = 'Base64';
-						bipButton.disabled = true;
-						fileButton.disabled = true;
-						qrButton.disabled = true;
-					}
+			for (let i = 0; i < numofpredefined; i++) {
+				const bipButton = document.getElementById(`bipbutton${i}`) as HTMLButtonElement;
+				const fileButton = document.getElementById(`filebutton${i}`) as HTMLButtonElement;
+				const qrButton = document.getElementById(`qrbutton${i}`) as HTMLButtonElement;
+				if (bipButton != null) {
+					resultasb64[i] = predefined[i];
+					bipButton.textContent = 'Base64';
+					bipButton.disabled = true;
+					fileButton.disabled = true;
+					qrButton.disabled = true;
 				}
 			}
 		}
