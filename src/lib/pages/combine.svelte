@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { invoke } from '@tauri-apps/api/tauri';
-	import { Button } from '../components/ui/button';
-	import { Input } from '../components/ui/input';
+	import { Button } from '../components/button';
+	import { Input } from '../components/input';
+	import Exit from '../icons/exit.svelte';
 	import Secret from './secret.svelte';
 	import { toast } from 'svelte-sonner';
 
@@ -71,7 +72,7 @@
 				let [bip, short, valid, ident] = properties[i] as [boolean, boolean, boolean, boolean];
 				if (bip && short) {
 					elm.textContent = 'Short Share Detected';
-				} else if (ident){
+				} else if (ident) {
 					elm.textContent = 'Identical Share Detected';
 				} else if (bip) {
 					elm.textContent = 'BIP-39 Mnemonic Detected';
@@ -97,13 +98,13 @@
 
 		await invoke('build_secret', { list: sharestrimmed })
 			.then((res) => {
-				if (!(res as string).trim().replace(/^\0+/, '').replace(/\0+$/, '')){
+				if (!(res as string).trim().replace(/^\0+/, '').replace(/\0+$/, '')) {
 					toast('Error', {
-						description: "Invalid Secret Generated"
+						description: 'Invalid Secret Generated'
 					});
 					return;
 				}
-				
+
 				secret = res as string;
 				showNewPage = !showNewPage;
 			})
@@ -161,20 +162,7 @@
 			class="absolute right-0 top-0 m-6 text-gray-500 hover:text-gray-700 focus:outline-none"
 			on:click={() => (showNewPage = !showNewPage)}
 		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-6 w-6"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					stroke-width="2"
-					d="M6 18L18 6M6 6l12 12"
-				/>
-			</svg>
+			<Exit />
 		</button>
 		<Secret {secret} />
 	</div>

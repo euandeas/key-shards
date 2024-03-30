@@ -6,51 +6,44 @@ use sha3::{
     digest::{ExtendableOutput, Update, XofReader},
     Shake256,
 };
-use block_padding::{Pkcs7, RawPadding};
 use shami_rs::aead as saead;
 use shami_rs::base as sbase;
 
-fn pkcs7_unpad(input: Vec<u8>) -> Vec<u8> {
-    match Pkcs7::raw_unpad(input.as_slice()) {
-        Ok(v) => v.to_vec(),
-        Err(_) => input.to_vec(),
-    }
-}
+use crate::padding::pkcs7_unpad;
 
 #[tauri::command]
-pub fn build_secret(list: Vec<String>) -> Result<String,String>{
+pub fn build_secret(list: Vec<String>) -> Result<String, String> {
     let mut shares_bytes = vec![vec![]; list.len()];
     for (i, share) in list.iter().enumerate() {
-        match Mnemonic::parse_normalized(share.as_str()){
-            Ok(m) => 
-            {
+        match Mnemonic::parse_normalized(share.as_str()) {
+            Ok(m) => {
                 shares_bytes[i] = pkcs7_unpad(m.to_entropy().to_vec());
-            },
+            }
             Err(_) => match URL_SAFE_NO_PAD.decode(share) {
                 Ok(b) => {
                     shares_bytes[i] = b;
-                },
+                }
                 Err(_) => shares_bytes[i] = share.as_bytes().to_vec(),
-            }
+            },
         }
     }
 
     let longest = shares_bytes
-    .iter()
-    .map(|element| element.len())
-    .max()
-    .unwrap_or(0);
+        .iter()
+        .map(|element| element.len())
+        .max()
+        .unwrap_or(0);
 
     let mut short_share_bytes: Vec<Vec<u8>> = shares_bytes
-    .iter()
-    .filter(|share| share.len() < longest)
-    .cloned()
-    .collect();
+        .iter()
+        .filter(|share| share.len() < longest)
+        .cloned()
+        .collect();
 
     shares_bytes.retain(|share| share.len() == longest);
 
-    if short_share_bytes.len() > 2{
-        return Err("Invalid Shares".to_string())
+    if short_share_bytes.len() > 2 {
+        return Err("Invalid Shares".to_string());
     }
 
     let aead = check_suffixes_same(&shares_bytes);
@@ -80,14 +73,16 @@ pub fn build_secret(list: Vec<String>) -> Result<String,String>{
     }
 }
 
-fn handle_secret_result<E: std::fmt::Display>(result: Result<Vec<u8>, E>) -> Result<String, String> {
+fn handle_secret_result<E: std::fmt::Display>(
+    result: Result<Vec<u8>, E>,
+) -> Result<String, String> {
     match result {
         Ok(data) => match from_utf8(&data) {
             Ok(s) => Ok(s.to_string()),
             Err(_) => match Mnemonic::from_entropy(&data) {
                 Ok(m) => Ok(m.to_string()),
                 Err(_) => Err("Invalid Secret".to_string()),
-            }
+            },
         },
         Err(e) => Err(e.to_string()),
     }
@@ -109,16 +104,8 @@ fn check_suffixes_same(shares_bytes: &[Vec<u8>]) -> bool {
     true
 }
 
-fn hash_short_shares(
-    short_shares: &Vec<Vec<u8>>,
-    longlen: usize,
-    aead: bool,
-) -> Vec<Vec<u8>> {
-    let sharelen: usize = if aead {
-        32 + 1
-    } else {
-        longlen
-    };
+fn hash_short_shares(short_shares: &Vec<Vec<u8>>, longlen: usize, aead: bool) -> Vec<Vec<u8>> {
+    let sharelen: usize = if aead { 32 + 1 } else { longlen };
 
     let mut short_shares_hashed = Vec::new();
     for share in short_shares {

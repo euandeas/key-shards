@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { Toaster } from './lib/components/ui/sonner';
+	import { Toaster } from './lib/components/sonner';
 	import Create from './lib/pages/create.svelte';
 	import Combine from './lib/pages/combine.svelte';
-	import AppRail from './lib/components/ui/apprail/apprail.svelte';
-	import AppRailTile from './lib/components/ui/apprail/apprailtile.svelte';
-	import AppRailAnchor from './lib/components/ui/apprail/apprailanchor.svelte';
+	import AppRail from './lib/components/apprail/apprail.svelte';
+	import AppRailTile from './lib/components/apprail/apprailtile.svelte';
+	import AppRailAnchor from './lib/components/apprail/apprailanchor.svelte';
 
 	if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
 		document.documentElement.classList.add('dark');

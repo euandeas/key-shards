@@ -91,9 +91,6 @@
 	on:focus
 	on:blur
 >
-	<!-- A11y attributes are not allowed on <label> -->
-	<!-- FIXME: resolve a11y warnings -->
-	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<button
 		class="app-rail-wrapper {classesWrapper}"
 		tabindex="0"

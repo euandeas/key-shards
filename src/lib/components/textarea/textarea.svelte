@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { HTMLTextareaAttributes } from 'svelte/elements';
-	import { cn } from '../../../utils/utils.js';
+	import { cn } from '../../utils/utils.js';
 
 	type $$Props = HTMLTextareaAttributes;
 
