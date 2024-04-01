@@ -3,9 +3,9 @@
 
 	export async function InitSecret(sentsecret: string) {
 		secret = sentsecret;
-		secretasmnemonic = await invoke('tryutf8tomnemonic', { utf: secret }) as string;
+		secretasmnemonic = (await invoke('tryutf8tomnemonic', { utf: secret })) as string;
 	}
-	
+
 	let secret: string = '';
 	let secretasmnemonic: string = '';
 </script>

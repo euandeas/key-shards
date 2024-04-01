@@ -44,7 +44,7 @@
 	let resultingSharesComponent: Shares;
 
 	const debouncedValidateInput = debounce(validateMnemonic, 500);
-	
+
 	function debounce<F extends (...args: any[]) => void>(fn: F, delay: number) {
 		let timeoutId: ReturnType<typeof setTimeout> | undefined;
 		return (...args: Parameters<F>): void => {
@@ -79,7 +79,7 @@
 		let results: string[] = [];
 		let predefined: string[] = [];
 		let numofpredefined: number = 0;
-		
+
 		const threshold = Number((document.getElementById('threshold') as HTMLInputElement).value);
 		const total_shares: number = Number(
 			(document.getElementById('total_shares') as HTMLInputElement).value
@@ -218,10 +218,7 @@
 			</div>
 		</div>
 		{#if checkedadv}
-			<AdvancedOptions
-				bind:checkedpre
-				bind:checkedaead
-				bind:checkedpadding/>
+			<AdvancedOptions bind:checkedpre bind:checkedaead bind:checkedpadding />
 			{#if checkedpre}
 				<PredefinedShares
 					bind:selectedNumShares
@@ -230,7 +227,8 @@
 					bind:isbip39
 					bind:checkedaead
 					bind:checkedpadding
-					bind:secret/>
+					bind:secret
+				/>
 			{/if}
 		{/if}
 
@@ -247,6 +245,6 @@
 		>
 			<Exit />
 		</button>
-		<Shares bind:this={resultingSharesComponent}/>
+		<Shares bind:this={resultingSharesComponent} />
 	</div>
 </div>

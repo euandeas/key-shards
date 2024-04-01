@@ -4,7 +4,7 @@
 	import { invoke } from '@tauri-apps/api/tauri';
 	import { onMount } from 'svelte';
 
-	export let results: string[] = ['',''];
+	export let results: string[] = ['', ''];
 
 	export function InitShares(sentresults: string[], predefined: string[], numofpredefined: number) {
 		results = sentresults;
@@ -16,11 +16,8 @@
 			const fileButton = document.getElementById(`filebutton${i}`) as HTMLButtonElement;
 			const qrButton = document.getElementById(`qrbutton${i}`) as HTMLButtonElement;
 
-			console.log(i, numofpredefined);
-			console.log(bipButton, fileButton, qrButton)
-			
 			if (bipButton != null) {
-				if (i < numofpredefined){
+				if (i < numofpredefined) {
 					resultasb64[i] = predefined[i];
 					bipButton.textContent = 'Base64';
 					bipButton.disabled = true;
