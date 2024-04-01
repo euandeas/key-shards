@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
-	import { Label } from '../components/label';
-	import { Textarea } from '../components/textarea';
-	import { Input } from '../components/input';
-	import { Checkbox } from '../components/checkbox';
-	import { Button } from '../components/button';
-	import AdvancedOptions from '../components/advancedoptions.svelte';
-	import PredefinedShares from '../components/predefinedshares.svelte';
-	import SlideUp from '../components/slideup.svelte';
+	import { Label } from '../lib/components/label';
+	import { Textarea } from '../lib/components/textarea';
+	import { Input } from '../lib/components/input';
+	import { Checkbox } from '../lib/components/checkbox';
+	import { Button } from '../lib/components/button';
+	import AdvancedOptions from '../lib/components/advancedoptions.svelte';
+	import PredefinedShares from '../lib/components/predefinedshares.svelte';
+	import SlideUp from '../lib/components/slideup.svelte';
 	import Shares from './shares.svelte';
 	import { invoke } from '@tauri-apps/api/tauri';
 

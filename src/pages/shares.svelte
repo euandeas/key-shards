@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Button } from '../components/button';
-	import { Input } from '../components/input';
+	import { Button } from '../lib/components/button';
+	import { Input } from '../lib/components/input';
 	import { invoke } from '@tauri-apps/api/tauri';
 	import { onMount } from 'svelte';
 

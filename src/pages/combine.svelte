@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { invoke } from '@tauri-apps/api/tauri';
-	import { Button } from '../components/button';
-	import { Input } from '../components/input';
-	import SlideUp from '../components/slideup.svelte';
+	import { Button } from '../lib/components/button';
+	import { Input } from '../lib/components/input';
+	import SlideUp from '../lib/components/slideup.svelte';
 	import Secret from './secret.svelte';
 	import { toast } from 'svelte-sonner';
 
