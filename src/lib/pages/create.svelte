@@ -7,13 +7,13 @@
 	import { Button } from '../components/button';
 	import AdvancedOptions from '../components/advancedoptions.svelte';
 	import PredefinedShares from '../components/predefinedshares.svelte';
-	import Exit from '../icons/exit.svelte';
+	import SlideUp from '../components/slideup.svelte';
 	import Shares from './shares.svelte';
 	import { invoke } from '@tauri-apps/api/tauri';
 
 	$: {
 		debouncedValidateInput(secret);
-		// Uncheck "Predefined Shares" when "Advanced" is unchecked
+
 		if (!checkedadv) {
 			checkedpre = false;
 		}
@@ -231,20 +231,9 @@
 				/>
 			{/if}
 		{/if}
-
 		<Button class="mb-8 w-full" on:click={generateClicked}>Generate</Button>
 	</div>
-	<div
-		class={`z-1 absolute overflow-x-hidden transition-all duration-1000 ease-in-out ${showNewPage ? 'translate-y-0' : 'translate-y-full'} top-0 h-full w-full p-8`}
-		style="
-    background-color: hsl(var(--background) / var(--tw-bg-opacity));"
-	>
-		<button
-			class="absolute right-0 top-0 m-6 text-gray-500 hover:text-gray-700 focus:outline-none"
-			on:click={() => (showNewPage = !showNewPage)}
-		>
-			<Exit />
-		</button>
+	<SlideUp bind:showNewPage>
 		<Shares bind:this={resultingSharesComponent} />
-	</div>
+	</SlideUp>
 </div>
