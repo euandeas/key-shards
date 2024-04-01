@@ -2,45 +2,48 @@
 	import { Button } from '../components/button';
 	import { Input } from '../components/input';
 	import { invoke } from '@tauri-apps/api/tauri';
+	import { onMount } from 'svelte';
 
-	export let results: string[] = [];
-	export let predefined: string[] = [];
-	let resultasb64: string[] = [];
-	let resultsasbip: string[] = [];
-	export let numofpredefined: number = 0;
+	export let results: string[] = ['',''];
 
-	$: {
-		if (results.length === 0 || results.length !== 0) {
-			resultasb64 = [...results];
-			resultsasbip = [];
+	export function InitShares(sentresults: string[], predefined: string[], numofpredefined: number) {
+		results = sentresults;
+		resultasb64 = [...results];
+		resultsasbip = [];
 
-			for (let i = 0; i < results.length; i++) {
-				const bipButton = document.getElementById(`bipbutton${i}`) as HTMLButtonElement;
-				const fileButton = document.getElementById(`filebutton${i}`) as HTMLButtonElement;
-				const qrButton = document.getElementById(`qrbutton${i}`) as HTMLButtonElement;
-				if (bipButton != null) {
-					bipButton.textContent = 'BIP';
-					bipButton.disabled = false;
-					fileButton.disabled = false;
-					qrButton.disabled = false;
-				}
-				bytelength(i);
-			}
+		for (let i = 0; i < results.length; i++) {
+			const bipButton = document.getElementById(`bipbutton${i}`) as HTMLButtonElement;
+			const fileButton = document.getElementById(`filebutton${i}`) as HTMLButtonElement;
+			const qrButton = document.getElementById(`qrbutton${i}`) as HTMLButtonElement;
 
-			for (let i = 0; i < numofpredefined; i++) {
-				const bipButton = document.getElementById(`bipbutton${i}`) as HTMLButtonElement;
-				const fileButton = document.getElementById(`filebutton${i}`) as HTMLButtonElement;
-				const qrButton = document.getElementById(`qrbutton${i}`) as HTMLButtonElement;
-				if (bipButton != null) {
+			console.log(i, numofpredefined);
+			console.log(bipButton, fileButton, qrButton)
+			
+			if (bipButton != null) {
+				if (i < numofpredefined){
 					resultasb64[i] = predefined[i];
 					bipButton.textContent = 'Base64';
 					bipButton.disabled = true;
 					fileButton.disabled = true;
 					qrButton.disabled = true;
+				} else {
+					bipButton.textContent = 'BIP';
+					bipButton.disabled = false;
+					fileButton.disabled = false;
+					qrButton.disabled = false;
+
+					bytelength(i, bipButton);
 				}
 			}
 		}
 	}
+
+	onMount(() => {
+		InitShares(results, [], 0);
+	});
+
+	let resultasb64: string[] = [];
+	let resultsasbip: string[] = [];
 
 	async function toggleBIP(i: number) {
 		const bipButton = document.getElementById(`bipbutton${i}`) as HTMLButtonElement;
@@ -61,17 +64,10 @@
 		}
 	}
 
-	async function bytelength(num: number) {
-		if ((num === 0 || num === 1) && numofpredefined > 0) {
-			return;
-		}
-
+	async function bytelength(num: number, button: HTMLButtonElement) {
 		let size: number = await invoke('bytelength', { base64: results[num] });
 		if (size > 32) {
-			const bipButton = document.getElementById(`bipbutton${num}`) as HTMLButtonElement;
-			if (bipButton != null) {
-				bipButton.disabled = true;
-			}
+			button.disabled = true;
 		}
 	}
 

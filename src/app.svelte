@@ -19,7 +19,6 @@
 	<Toaster />
 	<div class="flex h-screen">
 		<AppRail class="h-screen">
-			<!-- --- -->
 			<AppRailTile bind:group={currentPage} name="tile-1" value={0} title="tile-1">
 				<svelte:fragment slot="lead">(icon)</svelte:fragment>
 				<span>Create</span>
@@ -28,7 +27,6 @@
 				<svelte:fragment slot="lead">(icon)</svelte:fragment>
 				<span>Combine</span>
 			</AppRailTile>
-			<!-- --- -->
 			<svelte:fragment slot="trail">
 				<AppRailAnchor href="/" target="_blank" title="Account">(info icon)</AppRailAnchor>
 			</svelte:fragment>

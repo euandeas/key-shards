@@ -6,8 +6,18 @@
 	import Secret from './secret.svelte';
 	import { toast } from 'svelte-sonner';
 
+	$: {
+		if (shares.length > 0) {
+			debouncedValidateInput();
+		}
+	}
+
 	let shares: string[] = [''];
 	let secret = '';
+	let secretComponent: Secret;
+	let showNewPage = false;
+
+	const debouncedValidateInput = debounce(validateShares, 500);
 
 	function addShare() {
 		shares = [...shares, ''];
@@ -52,14 +62,6 @@
 			}, delay);
 		};
 	}
-
-	$: {
-		if (shares.length > 0) {
-			debouncedValidateInput();
-		}
-	}
-
-	const debouncedValidateInput = debounce(validateShares, 500);
 
 	async function validateShares() {
 		let sharestrimmed = shares.map((str) => str.trim());
@@ -106,6 +108,7 @@
 				}
 
 				secret = res as string;
+				secretComponent.InitSecret(secret);
 				showNewPage = !showNewPage;
 			})
 			.catch((err) => {
@@ -114,8 +117,6 @@
 				});
 			});
 	}
-
-	let showNewPage = false;
 </script>
 
 <div class="relative h-full overflow-y-hidden">
@@ -164,6 +165,6 @@
 		>
 			<Exit />
 		</button>
-		<Secret {secret} />
+		<Secret bind:this={secretComponent} />
 	</div>
 </div>

@@ -5,15 +5,11 @@
 	import { Input } from '../components/input';
 	import { Checkbox } from '../components/checkbox';
 	import { Button } from '../components/button';
+	import AdvancedOptions from '../components/advancedoptions.svelte';
+	import PredefinedShares from '../components/predefinedshares.svelte';
 	import Exit from '../icons/exit.svelte';
 	import Shares from './shares.svelte';
-	import * as Select from '../components/select';
 	import { invoke } from '@tauri-apps/api/tauri';
-
-	let checkedadv = false;
-	let checkedpre = false;
-	let checkedaead = false;
-	let checkedpadding = false;
 
 	$: {
 		debouncedValidateInput(secret);
@@ -35,20 +31,20 @@
 		}
 	}
 
+	let checkedadv = false;
+	let checkedpre = false;
+	let checkedaead = false;
+	let checkedpadding = false;
+	let showNewPage = false;
 	let selectedNumShares = '1';
 	let share1Value = '';
 	let share2Value = '';
-
-	async function handleNumSharesChange(value: string) {
-		selectedNumShares = value;
-		if (value === '1') {
-			share2Value = '';
-		}
-	}
-
 	let secret = '';
 	let isbip39 = false;
+	let resultingSharesComponent: Shares;
 
+	const debouncedValidateInput = debounce(validateMnemonic, 500);
+	
 	function debounce<F extends (...args: any[]) => void>(fn: F, delay: number) {
 		let timeoutId: ReturnType<typeof setTimeout> | undefined;
 		return (...args: Parameters<F>): void => {
@@ -58,8 +54,6 @@
 			}, delay);
 		};
 	}
-
-	const debouncedValidateInput = debounce(validateMnemonic, 500);
 
 	async function validateMnemonic(secret: string) {
 		secret = secret.trim();
@@ -81,11 +75,11 @@
 		share2Value = '';
 	}
 
-	let results: string[] = [];
-	let predefined: string[] = [];
-	let numofpredefined: number = 0;
-
 	async function generateClicked() {
+		let results: string[] = [];
+		let predefined: string[] = [];
+		let numofpredefined: number = 0;
+		
 		const threshold = Number((document.getElementById('threshold') as HTMLInputElement).value);
 		const total_shares: number = Number(
 			(document.getElementById('total_shares') as HTMLInputElement).value
@@ -115,6 +109,13 @@
 		if (threshold > total_shares) {
 			toast('Error', {
 				description: 'Threshold must be less than or equal to total shares.'
+			});
+			return;
+		}
+
+		if (threshold < 3 && checkedpre) {
+			toast('Error', {
+				description: 'Threshold must be greater than 2 when using predefined shares.'
 			});
 			return;
 		}
@@ -185,30 +186,9 @@
 			numofpredefined = 0;
 		}
 
+		resultingSharesComponent.InitShares(results, predefined, numofpredefined);
 		showNewPage = !showNewPage;
 	}
-
-	async function pregenerateClicked(share: number) {
-		if (share === 1) {
-			share1Value = await invoke('generate_predefined', {
-				secret: secret,
-				othershare: share2Value,
-				aead: checkedaead,
-				isbip: isbip39,
-				ispad: checkedpadding
-			});
-		} else if (share === 2) {
-			share2Value = await invoke('generate_predefined', {
-				secret: secret,
-				othershare: share1Value,
-				aead: checkedaead,
-				isbip: isbip39,
-				ispad: checkedpadding
-			});
-		}
-	}
-
-	let showNewPage = false;
 </script>
 
 <div class="relative h-full overflow-y-hidden">
@@ -238,80 +218,19 @@
 			</div>
 		</div>
 		{#if checkedadv}
-			<div class="mb-8 flex">
-				<div class="mr-6 flex items-center space-x-2">
-					<Checkbox id="predefined" bind:checked={checkedpre} />
-					<Label
-						for="predefined"
-						class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-					>
-						Predefined Shares
-					</Label>
-				</div>
-				<div class="mr-6 flex items-center space-x-2">
-					<Checkbox id="aead" bind:checked={checkedaead} />
-					<Label
-						for="aead"
-						class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-					>
-						XChaCha20-Poly1305 AEAD
-					</Label>
-				</div>
-				<div class="flex items-center space-x-2">
-					<Checkbox id="padding" bind:checked={checkedpadding} />
-					<Label
-						for="padding"
-						class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-					>
-						Padding
-					</Label>
-				</div>
-			</div>
+			<AdvancedOptions
+				bind:checkedpre
+				bind:checkedaead
+				bind:checkedpadding/>
 			{#if checkedpre}
-				<div class="mb-8">
-					<div class="mb-4">
-						<Select.Root>
-							<Select.Label class="pl-0">Number of Predefined Shares</Select.Label>
-							<Select.Trigger class="w-[180px]">
-								<Select.Value placeholder="1" />
-							</Select.Trigger>
-							<Select.Content>
-								<Select.Item value="1" on:click={() => handleNumSharesChange('1')}>1</Select.Item>
-								<Select.Item value="2" on:click={() => handleNumSharesChange('2')}>2</Select.Item>
-							</Select.Content>
-						</Select.Root>
-					</div>
-					<div class="grid grid-cols-2 gap-4">
-						{#if selectedNumShares === '1' || selectedNumShares === '2'}
-							<div class="relative">
-								<Input
-									id="share1"
-									disabled
-									class="select-text pr-20 disabled:cursor-text disabled:opacity-100"
-									bind:value={share1Value}
-								/>
-								<Button
-									class="absolute inset-y-0 right-0 rounded-l-none"
-									on:click={() => pregenerateClicked(1)}>Generate</Button
-								>
-							</div>
-						{/if}
-						{#if selectedNumShares === '2'}
-							<div class="relative">
-								<Input
-									id="share2"
-									disabled
-									class="select-text pr-20 disabled:cursor-text disabled:opacity-100"
-									bind:value={share2Value}
-								/>
-								<Button
-									class="absolute inset-y-0 right-0 rounded-l-none"
-									on:click={() => pregenerateClicked(2)}>Generate</Button
-								>
-							</div>
-						{/if}
-					</div>
-				</div>
+				<PredefinedShares
+					bind:selectedNumShares
+					bind:share1Value
+					bind:share2Value
+					bind:isbip39
+					bind:checkedaead
+					bind:checkedpadding
+					bind:secret/>
 			{/if}
 		{/if}
 
@@ -328,6 +247,6 @@
 		>
 			<Exit />
 		</button>
-		<Shares {results} {numofpredefined} {predefined} />
+		<Shares bind:this={resultingSharesComponent}/>
 	</div>
 </div>

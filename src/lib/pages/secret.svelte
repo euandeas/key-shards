@@ -1,16 +1,13 @@
 <script lang="ts">
 	import { invoke } from '@tauri-apps/api/tauri';
 
-	export let secret: string = '';
-	let secretasutf = '';
-
-	$: {
-		trymnemonic(secret);
+	export async function InitSecret(sentsecret: string) {
+		secret = sentsecret;
+		secretasmnemonic = await invoke('tryutf8tomnemonic', { utf: secret }) as string;
 	}
-
-	async function trymnemonic(str: string) {
-		secretasutf = await invoke('tryutf8tomnemonic', { utf: str });
-	}
+	
+	let secret: string = '';
+	let secretasmnemonic: string = '';
 </script>
 
 <div class="mt-12 flex h-5/6 items-center justify-center">
@@ -19,7 +16,7 @@
 			{secret}
 		</h3>
 		<small class="mb-10 text-center text-sm font-medium leading-none text-gray-500">
-			{secretasutf}
+			{secretasmnemonic}
 		</small>
 		<small class="text-center text-sm font-medium leading-none text-gray-500">
 			Displaying a secret does not ensure its validity. Only the XChaCha20-Poly1305 option can
