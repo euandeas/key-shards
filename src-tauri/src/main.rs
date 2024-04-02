@@ -12,8 +12,8 @@ mod building_shares;
 mod building_secret;
 mod exporting_shares;
 mod importing_shares;
-mod password;
 pub mod padding;
+mod password;
 
 #[tauri::command]
 fn verify_mnemonic(mnemonic: &str) -> bool {
