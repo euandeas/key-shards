@@ -5,13 +5,22 @@
 	import { Slider } from '../lib/components/slider';
 	import * as Select from '../lib/components/select';
 	import * as Tabs from '../lib/components/tabs';
+	import CopyIcon from '../lib/icons/copy.svelte';
 
 	import { invoke } from '@tauri-apps/api/tauri';
 
 	$: {
 		formattedValue = sliderValue[0].toString();
-		
-		if (uppercaseChecked || lowercaseChecked || numbersChecked || symbolsChecked || ambiguousChecked || capitaliseChecked) {}
+
+		if (
+			uppercaseChecked ||
+			lowercaseChecked ||
+			numbersChecked ||
+			symbolsChecked ||
+			ambiguousChecked ||
+			capitaliseChecked
+		) {
+		}
 
 		regenerate();
 	}
@@ -91,7 +100,7 @@
 		} else if (elm) {
 			clearElm(elm);
 		}
-		
+
 		regenerate();
 	}
 
@@ -126,7 +135,7 @@
 			}
 			// Check if the character is one of the specified special symbols and specialFlag is false
 			else if ('!@#$%^&*'.includes(char) && !specialFlag) {
-				characterRange += 8; 
+				characterRange += 8;
 				specialFlag = true;
 			}
 
@@ -230,10 +239,17 @@
 	</Tabs.Root>
 	<div class="mb-8">
 		<h4
-			class="mb-2 min-h-16 scroll-m-20 break-all rounded-md border border-input p-4 text-center text-xl font-semibold tracking-tight"
+			class="mb-2 flex min-h-16 scroll-m-20 items-center break-all rounded-md border border-input p-4 text-center text-xl font-semibold tracking-tight"
 		>
-			{generatedValue}
+			<div class="flex-grow text-center">
+				{generatedValue}
+			</div>
+			<CopyIcon
+				class="ml-2 cursor-pointer text-gray-500 hover:text-gray-700"
+				text={generatedValue}
+			/>
 		</h4>
+
 		<p class="text-xs text-opacity-80" id="passInfo" />
 	</div>
 	{#if showSlide}
@@ -245,7 +261,7 @@
 	<div class="mb-8 flex">
 		{#if option === 'password'}
 			<div class="mr-6 flex items-center space-x-2">
-				<Checkbox id="uppercase" bind:checked={uppercaseChecked}/>
+				<Checkbox id="uppercase" bind:checked={uppercaseChecked} />
 				<Label
 					for="uppercase"
 					class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -254,7 +270,7 @@
 				</Label>
 			</div>
 			<div class="mr-6 flex items-center space-x-2">
-				<Checkbox id="lowercase" bind:checked={lowercaseChecked}/>
+				<Checkbox id="lowercase" bind:checked={lowercaseChecked} />
 				<Label
 					for="lowercase"
 					class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -263,7 +279,7 @@
 				</Label>
 			</div>
 			<div class="mr-6 flex items-center space-x-2">
-				<Checkbox id="numbers" bind:checked={numbersChecked}/>
+				<Checkbox id="numbers" bind:checked={numbersChecked} />
 				<Label
 					for="numbers"
 					class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -272,7 +288,7 @@
 				</Label>
 			</div>
 			<div class="mr-6 flex items-center space-x-2">
-				<Checkbox id="symbols" bind:checked={symbolsChecked}/>
+				<Checkbox id="symbols" bind:checked={symbolsChecked} />
 				<Label
 					for="symbols"
 					class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -281,7 +297,7 @@
 				</Label>
 			</div>
 			<div class="flex items-center space-x-2">
-				<Checkbox id="ambiguous" bind:checked={ambiguousChecked}/>
+				<Checkbox id="ambiguous" bind:checked={ambiguousChecked} />
 				<Label
 					for="ambiguous"
 					class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -306,7 +322,7 @@
 				</Select.Root>
 			</div>
 			<div class="flex items-center space-x-2">
-				<Checkbox id="capitalise" bind:checked={capitaliseChecked}/>
+				<Checkbox id="capitalise" bind:checked={capitaliseChecked} />
 				<Label
 					for="capitalise"
 					class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"

@@ -3,6 +3,7 @@
 	import { Input } from '../lib/components/input';
 	import { invoke } from '@tauri-apps/api/tauri';
 	import { onMount } from 'svelte';
+	import CopyIcon from '../lib/icons/copy.svelte';
 
 	export let results: string[] = ['', ''];
 
@@ -80,11 +81,17 @@
 <div class="mt-12">
 	{#each resultasb64 as result, i}
 		<div class="mb-6">
-			<Input
-				value={result}
-				disabled
-				class="mb-2 select-text disabled:cursor-text disabled:opacity-100"
-			/>
+			<div class="relative">
+				<Input
+					value={result}
+					disabled
+					class="mb-2 select-text pr-12 disabled:cursor-text disabled:opacity-100"
+				/>
+				<CopyIcon
+					class="absolute inset-y-0 right-0 flex cursor-pointer items-center px-3 text-gray-500 hover:text-gray-700"
+					text={result}
+				/>
+			</div>
 			<div class="flex w-full">
 				<Button
 					id="bipbutton{i}"
