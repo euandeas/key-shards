@@ -1,23 +1,28 @@
 <script lang="ts">
-	import { toast } from 'svelte-sonner';
 	import { Label } from '../lib/components/label';
-	import { Input } from '../lib/components/input';
 	import { Checkbox } from '../lib/components/checkbox';
 	import { Button } from '../lib/components/button';
 	import { Slider } from '../lib/components/slider';
 	import * as Select from '../lib/components/select';
 	import * as Tabs from '../lib/components/tabs';
-	import { onMount } from 'svelte';
 
 	import { invoke } from '@tauri-apps/api/tauri';
 
-	$: formattedValue = sliderValue[0].toString();
+	$: {
+		formattedValue = sliderValue[0].toString();
+		
+		if (uppercaseChecked || lowercaseChecked || numbersChecked || symbolsChecked || ambiguousChecked || capitaliseChecked) {}
+
+		regenerate();
+	}
+
 	$: displayText =
 		option === 'password' ? `${formattedValue} Characters` : `${formattedValue} Words`;
 
 	let generatedValue: string = '';
 	let option = 'password';
 	let showSlide = true;
+	let formattedValue = '16';
 
 	let sliderValue: number[] = [16];
 	let sliderMin = 5;
@@ -62,6 +67,8 @@
 			}
 			showSlide = false;
 		}
+
+		regenerate();
 	}
 
 	function clearElm(elm: HTMLElement) {
@@ -84,10 +91,13 @@
 		} else if (elm) {
 			clearElm(elm);
 		}
+		
+		regenerate();
 	}
 
 	function seperatorChanged(value: string) {
 		seperator = value;
+		regenerate();
 	}
 
 	function calculatePasswordEntropy(password: string) {
@@ -101,31 +111,30 @@
 		for (const char of password) {
 			// Check if the character is a numeric and numericFlag is false
 			if (/[0-9]/.test(char) && !numericFlag) {
-				characterRange += 10; // Numerics range size is 10
+				characterRange += 10;
 				numericFlag = true;
 			}
 			// Check if the character is a lowercase Latin letter and lowercaseFlag is false
 			else if (/[a-z]/.test(char) && !lowercaseFlag) {
-				characterRange += 26; // Lowercase Latin letters range size is 26
+				characterRange += 26;
 				lowercaseFlag = true;
 			}
 			// Check if the character is an uppercase Latin letter and uppercaseFlag is false
 			else if (/[A-Z]/.test(char) && !uppercaseFlag) {
-				characterRange += 26; // Uppercase Latin letters range size is 26
+				characterRange += 26;
 				uppercaseFlag = true;
 			}
 			// Check if the character is one of the specified special symbols and specialFlag is false
 			else if ('!@#$%^&*'.includes(char) && !specialFlag) {
-				characterRange += 8; // Special symbols range size is 8
+				characterRange += 8; 
 				specialFlag = true;
 			}
 
+			// Break the loop if all the character types are found
 			if (numericFlag && lowercaseFlag && uppercaseFlag && specialFlag) {
 				break;
 			}
 		}
-
-		console.log(characterRange);
 
 		//Calculate the log2 of the character range
 		const log2CharacterRange = Math.log2(characterRange);
@@ -236,7 +245,7 @@
 	<div class="mb-8 flex">
 		{#if option === 'password'}
 			<div class="mr-6 flex items-center space-x-2">
-				<Checkbox id="uppercase" bind:checked={uppercaseChecked} />
+				<Checkbox id="uppercase" bind:checked={uppercaseChecked}/>
 				<Label
 					for="uppercase"
 					class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -245,7 +254,7 @@
 				</Label>
 			</div>
 			<div class="mr-6 flex items-center space-x-2">
-				<Checkbox id="lowercase" bind:checked={lowercaseChecked} />
+				<Checkbox id="lowercase" bind:checked={lowercaseChecked}/>
 				<Label
 					for="lowercase"
 					class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -254,7 +263,7 @@
 				</Label>
 			</div>
 			<div class="mr-6 flex items-center space-x-2">
-				<Checkbox id="numbers" bind:checked={numbersChecked} />
+				<Checkbox id="numbers" bind:checked={numbersChecked}/>
 				<Label
 					for="numbers"
 					class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -263,7 +272,7 @@
 				</Label>
 			</div>
 			<div class="mr-6 flex items-center space-x-2">
-				<Checkbox id="symbols" bind:checked={symbolsChecked} />
+				<Checkbox id="symbols" bind:checked={symbolsChecked}/>
 				<Label
 					for="symbols"
 					class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -272,7 +281,7 @@
 				</Label>
 			</div>
 			<div class="flex items-center space-x-2">
-				<Checkbox id="ambiguous" bind:checked={ambiguousChecked} />
+				<Checkbox id="ambiguous" bind:checked={ambiguousChecked}/>
 				<Label
 					for="ambiguous"
 					class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -297,7 +306,7 @@
 				</Select.Root>
 			</div>
 			<div class="flex items-center space-x-2">
-				<Checkbox id="capitalise" bind:checked={capitaliseChecked} />
+				<Checkbox id="capitalise" bind:checked={capitaliseChecked}/>
 				<Label
 					for="capitalise"
 					class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
