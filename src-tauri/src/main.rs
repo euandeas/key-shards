@@ -12,6 +12,7 @@ mod building_shares;
 mod building_secret;
 mod exporting_shares;
 mod importing_shares;
+mod password;
 pub mod padding;
 
 #[tauri::command]
@@ -111,7 +112,10 @@ fn main() {
             building_shares::build_shares_bip_predefined,
             building_shares::build_shares_bip_aead_predefined,
             building_shares::generate_predefined,
-            building_secret::build_secret
+            building_secret::build_secret,
+            password::generate_password,
+            password::generate_passphrase,
+            password::generate_bip
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

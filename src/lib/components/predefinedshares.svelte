@@ -12,7 +12,7 @@
 	export let checkedpadding: boolean;
 	export let secret: string;
 
-	async function handleNumSharesChange(value: string) {
+	function handleNumSharesChange(value: string) {
 		selectedNumShares = value;
 		if (value === '1') {
 			share2Value = '';

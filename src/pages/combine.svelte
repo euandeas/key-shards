@@ -143,14 +143,7 @@
 			{/each}
 			<Button class="w-full" on:click={addShare}>+</Button>
 		</div>
-		<div
-			class="absolute bottom-0 w-full p-8"
-			style="background-image: linear-gradient(
-			to top,
-			hsl(var(--background) / var(--tw-bg-opacity)) 85%,
-			hsl(var(--background) / calc(var(--tw-bg-opacity) * 0))
-		  );"
-		>
+		<div class="absolute bottom-0 w-full bg-gradient-to-t from-background from-85% p-8">
 			<Button class="w-full" on:click={combine}>Combine</Button>
 		</div>
 	</div>
