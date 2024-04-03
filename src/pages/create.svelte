@@ -10,6 +10,7 @@
 	import SlideUp from '../lib/components/slideup.svelte';
 	import Shares from './shares.svelte';
 	import { invoke } from '@tauri-apps/api/tauri';
+	import ToolTip from '../lib/components/tooltipbuilder.svelte'
 
 	$: {
 		debouncedValidateInput(secret);
@@ -201,11 +202,15 @@
 		<div class="mb-8 flex">
 			<div class="mr-6 grid flex-1 gap-1.5">
 				<Label for="threshold">Threshold</Label>
-				<Input id="threshold" pattern="[0-9]*" class="invalid:border-red-600" />
+				<ToolTip text={"The minimum shares needed to rebuild the secret"}>
+					<Input id="threshold" pattern="[0-9]*" class="invalid:border-red-600" />
+				</ToolTip>
 			</div>
 			<div class="grid flex-1 gap-1.5">
 				<Label for="total_shares">Total Shares</Label>
-				<Input id="total_shares" pattern="[0-9]*" class="invalid:border-red-600" />
+				<ToolTip text={"The total number of shares produced"}>
+					<Input id="total_shares" pattern="[0-9]*" class="invalid:border-red-600" />
+				</ToolTip>
 			</div>
 			<div class="flex flex-1 items-center justify-end space-x-2">
 				<Checkbox id="advanced" bind:checked={checkedadv} />

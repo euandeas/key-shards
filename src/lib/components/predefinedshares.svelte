@@ -41,17 +41,22 @@
 </script>
 
 <div class="mb-8">
-	<div class="mb-4">
-		<Select.Root>
-			<Select.Label class="pl-0">Number of Predefined Shares</Select.Label>
-			<Select.Trigger class="w-[180px]">
-				<Select.Value placeholder="1" />
-			</Select.Trigger>
-			<Select.Content>
-				<Select.Item value="1" on:click={() => handleNumSharesChange('1')}>1</Select.Item>
-				<Select.Item value="2" on:click={() => handleNumSharesChange('2')}>2</Select.Item>
-			</Select.Content>
-		</Select.Root>
+	<div class="mb-4 mb-4 flex items-center">
+		<div>
+			<Select.Root>
+				<Select.Label class="pl-0">Number of Predefined Shares</Select.Label>
+				<Select.Trigger class="w-[180px]">
+					<Select.Value placeholder="1" />
+				</Select.Trigger>
+				<Select.Content>
+					<Select.Item value="1" on:click={() => handleNumSharesChange('1')}>1</Select.Item>
+					<Select.Item value="2" on:click={() => handleNumSharesChange('2')}>2</Select.Item>
+				</Select.Content>
+			</Select.Root>
+		</div>	
+		<p class="ml-5 leading-7 text-yellow-500">
+			This is an experimental feature, the security implications have not been fully investigated. Use at your own risk!
+		</p>
 	</div>
 	<div class="grid grid-cols-2 gap-4">
 		{#if selectedNumShares === '1' || selectedNumShares === '2'}

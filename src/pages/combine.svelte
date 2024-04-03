@@ -100,7 +100,7 @@
 
 		await invoke('build_secret', { list: sharestrimmed })
 			.then((res) => {
-				if (!(res as string).trim().replace(/^\0+/, '').replace(/\0+$/, '')) {
+				if (!(res as string).trim().replace(/^\0+/, '').replace(/\0+$/, '').replace(/[\s\u0000-\u001F\u007F-\u009F\u00AD\u0600-\u0604\u070F\u17B4\u17B5\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF\uFFF0-\uFFFF]/g, '')) {
 					toast('Error', {
 						description: 'Invalid Secret Generated'
 					});
@@ -134,10 +134,12 @@
 						>
 						<Button
 							id="scanbutton{i}"
-							class="mr-2 w-full rounded-s-none px-4 py-2"
+							class="w-full rounded-s-none px-4 py-2"
 							on:click={() => scanqr(i)}>Scan</Button
 						>
-						<Button class="w-18" on:click={() => removeShare(i)}>-</Button>
+						{#if shares.length > 1}
+						<Button class="ml-2 w-18" on:click={() => removeShare(i)}>-</Button>
+						{/if}
 					</div>
 				</div>
 			{/each}
