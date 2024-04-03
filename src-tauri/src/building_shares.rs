@@ -1,10 +1,7 @@
 use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _};
 use bip39::Mnemonic;
 use rand_core::{OsRng, RngCore};
-use sha3::{
-    digest::{ExtendableOutput, Update, XofReader},
-    Shake256,
-};
+use argon2::Argon2;
 use shami_rs::aead as saead;
 use shami_rs::base as sbase;
 use shami_rs::bip39 as sbip39;
@@ -66,11 +63,8 @@ pub fn hash_preshares(
             Err(_) => return Vec::new(), // Return an empty vector if parsing fails
         };
 
-        let mut hasher = Shake256::default();
-        hasher.update(&shareparsed);
-        let mut reader = hasher.finalize_xof();
         let mut share_hashed = vec![0u8; sharelen];
-        reader.read(&mut share_hashed);
+        let _ = Argon2::default().hash_password_into(&shareparsed, b"KEY-SHARDS-SALT", &mut share_hashed);
         preshares_hashed.push(share_hashed);
     }
 
@@ -219,21 +213,15 @@ pub fn generate_predefined(
             Err(_) => return "".to_string(),
         };
 
-        let mut hasher = Shake256::default();
-        hasher.update(&others);
-        let mut reader = hasher.finalize_xof();
-        reader.read(&mut othershare_hashed);
+        let _ = Argon2::default().hash_password_into(&others, b"KEY-SHARDS-SALT", &mut othershare_hashed);     
     }
 
     let mut share = vec![0u8; 4];
     loop {
         OsRng.fill_bytes(&mut share);
 
-        let mut hasher = Shake256::default();
-        hasher.update(&share);
-        let mut reader = hasher.finalize_xof();
         let mut share_hashed = vec![0u8; sharelen];
-        reader.read(&mut share_hashed);
+        let _ = Argon2::default().hash_password_into(&share, b"KEY-SHARDS-SALT", &mut share_hashed); 
 
         if share_hashed[0] == 0 || othershare_hashed[0] == share_hashed[0] {
             continue;

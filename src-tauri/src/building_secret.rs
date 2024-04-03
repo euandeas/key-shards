@@ -2,10 +2,7 @@ use std::str::from_utf8;
 
 use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _};
 use bip39::Mnemonic;
-use sha3::{
-    digest::{ExtendableOutput, Update, XofReader},
-    Shake256,
-};
+use argon2::Argon2;
 use shami_rs::aead as saead;
 use shami_rs::base as sbase;
 
@@ -109,11 +106,8 @@ fn hash_short_shares(short_shares: &Vec<Vec<u8>>, longlen: usize, aead: bool) ->
 
     let mut short_shares_hashed = Vec::new();
     for share in short_shares {
-        let mut hasher = Shake256::default();
-        hasher.update(share);
-        let mut reader = hasher.finalize_xof();
         let mut share_hashed = vec![0u8; sharelen];
-        reader.read(&mut share_hashed);
+        let _ = Argon2::default().hash_password_into(share, b"KEY-SHARDS-SALT", &mut share_hashed);
         short_shares_hashed.push(share_hashed);
     }
 
