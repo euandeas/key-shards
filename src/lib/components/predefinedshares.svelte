@@ -53,9 +53,10 @@
 					<Select.Item value="2" on:click={() => handleNumSharesChange('2')}>2</Select.Item>
 				</Select.Content>
 			</Select.Root>
-		</div>	
+		</div>
 		<p class="ml-5 leading-7 text-yellow-500">
-			This is an experimental feature, the security implications have not been fully investigated. Use at your own risk!
+			This is an experimental feature, the security implications have not been fully investigated.
+			Use at your own risk!
 		</p>
 	</div>
 	<div class="grid grid-cols-2 gap-4">

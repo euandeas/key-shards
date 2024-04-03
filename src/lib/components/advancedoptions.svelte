@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Checkbox } from '../components/checkbox';
 	import { Label } from '../components/label';
-	import ToolTip from '../components/tooltipbuilder.svelte'
+	import ToolTip from '../components/tooltipbuilder.svelte';
 
 	export let checkedpre: boolean;
 	export let checkedaead: boolean;
@@ -9,7 +9,7 @@
 </script>
 
 <div class="mb-8 flex">
-	<ToolTip text={"Create up to 2 short memorable shares"}>
+	<ToolTip text={'Create up to 2 short memorable shares'}>
 		<div class="mr-6 flex items-center space-x-2">
 			<Checkbox id="predefined" bind:checked={checkedpre} />
 			<Label
@@ -20,7 +20,7 @@
 			</Label>
 		</div>
 	</ToolTip>
-	<ToolTip text={"Encrypt the secret before creating shares"}>
+	<ToolTip text={'Encrypt the secret before creating shares'}>
 		<div class="mr-6 flex items-center space-x-2">
 			<Checkbox id="aead" bind:checked={checkedaead} />
 			<Label
@@ -31,7 +31,7 @@
 			</Label>
 		</div>
 	</ToolTip>
-	<ToolTip text={"Shares aligned to 8-byte blocks"}>
+	<ToolTip text={'Shares aligned to 8-byte blocks'}>
 		<div class="flex items-center space-x-2">
 			<Checkbox id="padding" bind:checked={checkedpadding} />
 			<Label
