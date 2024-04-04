@@ -17,6 +17,8 @@
 
 		if (!checkedadv) {
 			checkedpre = false;
+			checkedaead = true;
+			checkedpadding = false;
 		}
 
 		if (
@@ -34,7 +36,7 @@
 
 	let checkedadv = false;
 	let checkedpre = false;
-	let checkedaead = false;
+	let checkedaead = true;
 	let checkedpadding = false;
 	let showNewPage = false;
 	let selectedNumShares = '1';
@@ -147,9 +149,9 @@
 			}
 		} else {
 			if (isbip39) {
-				functionToInvoke = 'build_shares_bip';
+				functionToInvoke = 'build_shares_bip_aead';
 			} else {
-				functionToInvoke = 'build_shares_base';
+				functionToInvoke = 'build_shares_aead';
 			}
 		}
 
