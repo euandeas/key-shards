@@ -18,7 +18,7 @@
 		if (!checkedadv) {
 			checkedpre = false;
 			checkedaead = true;
-			checkedpadding = false;
+			checkedpadding = true;
 		}
 
 		if (
@@ -37,7 +37,7 @@
 	let checkedadv = false;
 	let checkedpre = false;
 	let checkedaead = true;
-	let checkedpadding = false;
+	let checkedpadding = true;
 	let showNewPage = false;
 	let selectedNumShares = '1';
 	let share1Value = '';
@@ -116,7 +116,9 @@
 			return;
 		}
 
-		if (threshold < 3 && checkedpre) {
+		predefined = [share1Value, share2Value].filter((value) => value !== '');
+
+		if (checkedpre && threshold < predefined.length) {
 			toast('Error', {
 				description: 'Threshold must be greater than 2 when using predefined shares.'
 			});
@@ -154,8 +156,6 @@
 				functionToInvoke = 'build_shares_aead';
 			}
 		}
-
-		predefined = [share1Value, share2Value].filter((value) => value !== '');
 
 		if (checkedpre) {
 			if (share1Value === '' && share2Value === '') {

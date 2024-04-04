@@ -29,7 +29,6 @@
 	let numofpred: number = 0;
 	let pred: string[];
 
-
 	async function toggleBIP(i: number) {
 		const bipButton = document.getElementById(`bipbutton${i}`) as HTMLButtonElement;
 
@@ -49,15 +48,15 @@
 		}
 	}
 
-	async function bytelength(i: number): Promise<[boolean,boolean,boolean]> {	
+	async function bytelength(i: number): Promise<[boolean, boolean, boolean]> {
 		if (i < numofpred) {
-			return [true, true, true]
+			return [true, true, true];
 		} else {
 			let size: number = await invoke('bytelength', { base64: results[i] });
 			if (size > 32) {
-				return [true,false,false];
-			}		
-			return [false, false, false]
+				return [true, false, false];
+			}
+			return [false, false, false];
 		}
 	}
 
@@ -87,29 +86,30 @@
 				</div>
 				<div class="flex w-full">
 					{#await bytelength(i) then disabled}
-					<Button
-						id="bipbutton{i}"
-						class="w-full rounded-e-none px-4 py-2"
-						on:click={() => toggleBIP(i)}
-						disabled={disabled[0]}>
+						<Button
+							id="bipbutton{i}"
+							class="w-full rounded-e-none px-4 py-2"
+							on:click={() => toggleBIP(i)}
+							disabled={disabled[0]}
+						>
 							{#if disabled[0] === true && disabled[1] === true && disabled[2] === true}
-							Base64
-							{:else}		
-							BIP	
-							{/if}		
-					</Button>
-					<Button
-						id="filebutton{i}"
-						class="border-grey w-full rounded-none border-x px-4 py-2"
-						on:click={() => exportasfile(i)}
-						disabled={disabled[1]}>File</Button
-					>
-					<Button
-						id="qrbutton{i}"
-						class="w-full rounded-s-none px-4 py-2"
-						on:click={() => exportasqr(i)}
-						disabled={disabled[2]}>QR</Button
-					>
+								Base64
+							{:else}
+								BIP
+							{/if}
+						</Button>
+						<Button
+							id="filebutton{i}"
+							class="border-grey w-full rounded-none border-x px-4 py-2"
+							on:click={() => exportasfile(i)}
+							disabled={disabled[1]}>File</Button
+						>
+						<Button
+							id="qrbutton{i}"
+							class="w-full rounded-s-none px-4 py-2"
+							on:click={() => exportasqr(i)}
+							disabled={disabled[2]}>QR</Button
+						>
 					{/await}
 				</div>
 			</div>
