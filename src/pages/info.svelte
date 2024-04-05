@@ -13,8 +13,8 @@
 
 				This program would not be suitable for backing up every password that you use, a password
 				manager is more suited for this job. However, this program is suited for backing up master
-				passwords or the secret key that some services give you (e.g. 1Password or Proton). Another
-				use case may be the storage of cryptocurrency wallet keys.<br /><br />
+				passwords or the secret key that some services give you (e.g. 1Password or Proton).
+				Other use cases include cryptocurrency wallet keys or succession planning.<br /><br />
 
 				Unlike conventional secret sharing, this is not targeted towards distributing a secret among
 				a group, but instead the personal backup of secrets. However, this application can be used
