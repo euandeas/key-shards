@@ -10,7 +10,20 @@ This is based on an implementation of <a href="https://en.wikipedia.org/wiki/Sha
 
 ## Features
 
+- Runs on Windows, macOS & Linux
+- Free, open-source & auditable
+- Custom Rust Shamir's Secret Sharing implementation that supports
+    - XChaCha20-Poly1305 AEAD wrapper
+    - BIP Mnemonic compression wrapper
+    - Secret Padding
+    - *Experimental* Up to 2 shorter predefined shares for long secrets
+- Built-in password generator
+- Export shares as text, PEM files (<a href="https://datatracker.ietf.org/doc/html/rfc7468">RFC 7468</a>) or QR codes.
+- Scan QR codes if your device has a camera
+
 ## Built With
+
+Rust, Tauri & SvelteKit
 
 # Getting Started 
 
@@ -24,8 +37,16 @@ If you want to build the project yourself you can follow the steps below. This c
 
 ## Installation
 
+If you do not already have the source code:
 ```
-git clone 
+git clone https://github.com/euandeas/key-shards.git
+cd key-shards
+```
+
+Once inside the project directory, to get the program to run:
+```
+npm install
+npm run tauri dev
 ```
 
 # Usage
