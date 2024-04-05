@@ -16,7 +16,7 @@ This is based on an implementation of <a href="https://en.wikipedia.org/wiki/Sha
     - XChaCha20-Poly1305 AEAD wrapper
     - BIP Mnemonic compression wrapper
     - Secret Padding
-    - **Experimental** Up to 2 shorter predefined shares for long secrets
+    - **Experimental** - Up to 2 shorter predefined shares for long secrets
 - Built-in password generator
 - Export shares as text, PEM files (<a href="https://datatracker.ietf.org/doc/html/rfc7468">RFC 7468</a>) or QR codes.
 - Scan QR codes if your device has a camera
