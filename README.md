@@ -1,4 +1,16 @@
-# Key Shards
+<div align="center">
+  <a href="https://github.com/euandeas/key-shards">
+    <img src="assets/icon.png" alt="Logo" width="80" height="80">
+  </a>
+
+  <h3 align="center">Key Shards</h3>
+
+  <p align="center">
+    A distributed backup application for secrets, using Shamir's Secret Sharing.
+  </p>
+</div>
+
+# About
 
 Key Shards is a distributed backup application for private keys, passwords or any other important information. Several shares are produced and only a subset of them are required toreveal the secret.
 
@@ -51,5 +63,29 @@ npm run tauri dev
 
 # Usage
 
-# License
+Creating Shares:
+
+<img src="assets/creatingshares.gif" alt="Logo">
+
+Combining Shares:
+
+<img src="assets/creatingshares.gif" alt="Logo">
+
+## License
+
+Licensed under either of
+
+ * Apache License, Version 2.0
+   ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+ * MIT license
+   ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+
+at your option.
+
+## Contribution
+
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
+dual licensed as above, without any additional terms or conditions.
+
 
