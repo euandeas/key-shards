@@ -65,13 +65,13 @@ npm run tauri dev
 
 Creating Shares:
 
-<img src="assets/creatingshares.gif" alt="Logo">
+<img src="assets/creatingshares.gif" alt="Logo"><br />
 
 Combining Shares:
 
-<img src="assets/creatingshares.gif" alt="Logo">
+<img src="assets/creatingshares.gif" alt="Logo"><br />
 
-## License
+# License
 
 Licensed under either of
 
@@ -82,10 +82,8 @@ Licensed under either of
 
 at your option.
 
-## Contribution
+# Contribution
 
 Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
 dual licensed as above, without any additional terms or conditions.
-
-
