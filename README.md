@@ -4,6 +4,7 @@ bip39
 A Rust implementation of [BIP-39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki)
 mnemonic codes.
 
+This is a fork that allows lower entropy mnemonics to be generated when the `low_ent` feature is enabled.
 
 ## Word lists (languages)
 
