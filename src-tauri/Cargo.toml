@@ -21,7 +21,7 @@ base64 = "0.22.0"
 rand_core = { version = "0.6.4", features = ["getrandom"] }
 block-padding = "0.3.3"
 pem-rfc7468 = { version = "0.7.0", features = ["alloc"] }
-opencv = "0.89.0"
+opencv = "0.90.0"
 rand = "0.8.5"
 argon2 = "0.5.3"
 
