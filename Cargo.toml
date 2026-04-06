@@ -16,6 +16,11 @@ default = [ "std" ]
 std = [ "alloc", "serde/std", "unicode-normalization/std" ]
 rand = [ "crate_rand", "rand_core" ]
 alloc = [ "unicode-normalization" ]
+# Allows the use of lower entropy bip39 mnemonics.
+#
+# !WARNING!
+# Mnemonics with less than 12 words have low entropy and may be guessed by an attacker.
+low_ent = []
 
 # Note: English is the standard for bip39 so always included
 chinese-simplified = []
@@ -50,7 +55,7 @@ zeroize = { version = "1.5", features = ["zeroize_derive"], default-features = f
 
 # Unexported dependnecies
 bitcoin_hashes = { version = ">=0.12,<0.15", default-features = false }
-unicode-normalization = { version = "0.1.22", default-features = false, optional = true }
+unicode-normalization = { version = "=0.1.23", default-features = false, optional = true }
 
 [dev-dependencies]
 # Enabling the "rand" feature by default to run the benches

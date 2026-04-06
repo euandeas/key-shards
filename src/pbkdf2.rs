@@ -1,6 +1,6 @@
 use bitcoin_hashes::{hmac, sha512, Hash, HashEngine};
 
-const SALT_PREFIX: &'static str = "mnemonic";
+const SALT_PREFIX: &str = "mnemonic";
 
 /// Calculate the binary size of the mnemonic.
 fn mnemonic_byte_len<M>(mnemonic: M) -> usize
@@ -83,7 +83,7 @@ fn create_hmac_engine<M>(mnemonic: M) -> hmac::HmacEngine<sha512::Hash>
 fn u32_to_array_be(val: u32) -> [u8; 4] {
 	let mut res = [0; 4];
 	for i in 0..4 {
-		res[i] = ((val >> (4 - i - 1) * 8) & 0xff) as u8;
+		res[i] = ((val >> ((4 - i - 1) * 8)) & 0xff) as u8;
 	}
 	res
 }

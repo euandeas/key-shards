@@ -79,8 +79,13 @@ mod pbkdf2;
 pub use language::Language;
 
 /// The minimum number of words in a mnemonic.
+#[cfg(not(feature = "low_ent"))]
 #[allow(unused)]
 const MIN_NB_WORDS: usize = 12;
+
+#[cfg(feature = "low_ent")]
+#[allow(unused)]
+const MIN_NB_WORDS: usize = 3;
 
 /// The maximum number of words in a mnemonic.
 const MAX_NB_WORDS: usize = 24;
@@ -206,8 +211,14 @@ impl Mnemonic {
 	/// Entropy must be a multiple of 32 bits (4 bytes) and 128-256 bits in length.
 	pub fn from_entropy_in(language: Language, entropy: &[u8]) -> Result<Mnemonic, Error> {
 		const MAX_ENTROPY_BITS: usize = 256;
-		const MIN_ENTROPY_BITS: usize = 128;
 		const MAX_CHECKSUM_BITS: usize = 8;
+		
+		#[cfg(not(feature = "low_ent"))]
+		const MIN_ENTROPY_BITS: usize = 128;
+
+		#[cfg(feature = "low_ent")]
+		const MIN_ENTROPY_BITS: usize = 32;
+
 
 		let nb_bytes = entropy.len();
 		let nb_bits = nb_bytes * 8;
@@ -215,11 +226,11 @@ impl Mnemonic {
 		if nb_bits % 32 != 0 {
 			return Err(Error::BadEntropyBitCount(nb_bits));
 		}
-		if nb_bits < MIN_ENTROPY_BITS || nb_bits > MAX_ENTROPY_BITS {
+		if !(MIN_ENTROPY_BITS..=MAX_ENTROPY_BITS).contains(&nb_bits) {
 			return Err(Error::BadEntropyBitCount(nb_bits));
 		}
 
-		let check = sha256::Hash::hash(&entropy);
+		let check = sha256::Hash::hash(entropy);
 		let mut bits = [false; MAX_ENTROPY_BITS + MAX_CHECKSUM_BITS];
 		for i in 0..nb_bytes {
 			for j in 0..8 {
@@ -244,7 +255,7 @@ impl Mnemonic {
 
 		Ok(Mnemonic {
 			lang: language,
-			words: words,
+			words,
 		})
 	}
 
@@ -357,7 +368,7 @@ impl Mnemonic {
 	/// let list = Language::English.word_list();
 	/// let mnemonic = Mnemonic::from_entropy(&[0; 32]).unwrap();
 	/// for i in mnemonic.word_indices() {
-	/// 	println!("{} ({})", list[i], i);
+	///     println!("{} ({})", list[i], i);
 	/// }
 	/// ```
 	pub fn word_indices(&self) -> impl Iterator<Item = usize> + Clone + '_ {
@@ -372,7 +383,7 @@ impl Mnemonic {
 		{
 			// Start scope to drop first_word so that words can be reborrowed later.
 			let first_word = words.peek().ok_or(Error::BadWordCount(0))?;
-			if first_word.len() == 0 {
+			if first_word.is_empty() {
 				return Err(Error::BadWordCount(0));
 			}
 
@@ -416,7 +427,7 @@ impl Mnemonic {
 			}
 		}
 
-		return Err(Error::AmbiguousLanguages(AmbiguousLanguages(possible)));
+		Err(Error::AmbiguousLanguages(AmbiguousLanguages(possible)))
 	}
 
 	/// Determine the language of the mnemonic.
@@ -477,7 +488,7 @@ impl Mnemonic {
 
 		Ok(Mnemonic {
 			lang: language,
-			words: words,
+			words,
 		})
 	}
 
@@ -506,7 +517,7 @@ impl Mnemonic {
 
 		Ok(Mnemonic {
 			lang: language,
-			words: words,
+			words,
 		})
 	}
 
@@ -524,7 +535,7 @@ impl Mnemonic {
 	) -> Result<Mnemonic, Error> {
 		let mut cow = s.into();
 		Mnemonic::normalize_utf8_cow(&mut cow);
-		Ok(Mnemonic::parse_in_normalized(language, cow.as_ref())?)
+		Mnemonic::parse_in_normalized(language, cow.as_ref())
 	}
 
 	/// Parse a mnemonic and detect the language from the enabled languages.
@@ -539,7 +550,7 @@ impl Mnemonic {
 			Mnemonic::language_of(cow.as_ref())?
 		};
 
-		Ok(Mnemonic::parse_in_normalized(language, cow.as_ref())?)
+		Mnemonic::parse_in_normalized(language, cow.as_ref())
 	}
 
 	/// Get the number of words in the mnemonic.
@@ -738,6 +749,7 @@ mod tests {
 		}
 	}
 
+	
 	#[test]
 	fn test_vectors_english() {
 		// These vectors are tuples of
@@ -862,7 +874,19 @@ mod tests {
 				"f585c11aec520db57dd353c69554b21a89b20fb0650966fa0a9d6f74fd989d8f",
 				"void come effort suffer camp survey warrior heavy shoot primary clutch crush open amazing screen patrol group space point ten exist slush involve unfold",
 				"01f5bced59dec48e362f2c45b5de68b9fd6c92c6634f44d6d40aab69056506f0e35524a518034ddc1192e1dacd32c1ed3eaa3c3b131c88ed8e7e54c49a5d0998",
-			)
+			),
+			#[cfg(feature = "low_ent")]
+			(
+				"bd1aa2f5",
+				"rug steak run",
+				"3da54651ccace83cee601c0bbe1df3ab1e0ba99c6f56729c289826b481b91b7074987781d9f99b306718dfc1e327381477ea2c5a63480bb7f36949713244cf3d",
+			),
+			#[cfg(feature = "low_ent")]
+			(
+				"09bbd027f45ce65a",
+				"answer teach antique trim solar coffee",
+				"949eb00b63b95e6ae7c42d9e93accb142c33ce70de70030455a44f11ce8e4c10f2b4e6eafb385f4894a6b77d0c8a456a6013b57d84bf313039679768aaa8e9bd",
+			),
 		];
 
 		for vector in &test_vectors {
@@ -1002,6 +1026,7 @@ mod tests {
 		);
 	}
 
+	#[cfg(not(feature = "low_ent"))]
 	#[test]
 	fn test_invalid_entropy() {
 		//between 128 and 256 bits, but not divisible by 32
@@ -1031,6 +1056,17 @@ mod tests {
 				w, dbg
 			);
 		}
+	#[cfg(feature = "low_ent")]
+	#[test]
+	fn test_invalid_entropy() {
+		//between 32 and 256 bits, but not divisible by 32
+		assert_eq!(Mnemonic::from_entropy(&vec![b'x'; 17]), Err(Error::BadEntropyBitCount(136)));
+
+		//less than 32 bits
+		assert_eq!(Mnemonic::from_entropy(&vec![b'x'; 3]), Err(Error::BadEntropyBitCount(24)));
+
+		//greater than 256 bits
+		assert_eq!(Mnemonic::from_entropy(&vec![b'x'; 36]), Err(Error::BadEntropyBitCount(288)));
 	}
 
 	#[cfg(all(feature = "japanese", feature = "std"))]

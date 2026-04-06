@@ -27,9 +27,10 @@ pub(crate) const MAX_NB_LANGUAGES: usize = 10;
 ///
 /// The English language is always available, other languages are enabled using
 /// the compilation features.
-#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Default, Clone, Copy, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Language {
 	/// The English language.
+	#[default]
 	English,
 	#[cfg(feature = "chinese-simplified")]
 	/// The Simplified Chinese language.
@@ -58,12 +59,6 @@ pub enum Language {
 	#[cfg(feature = "spanish")]
 	/// The Spanish language.
 	Spanish,
-}
-
-impl Default for Language {
-	fn default() -> Self {
-		Language::English
-	}
 }
 
 impl Language {
