@@ -212,7 +212,7 @@ impl Mnemonic {
 	pub fn from_entropy_in(language: Language, entropy: &[u8]) -> Result<Mnemonic, Error> {
 		const MAX_ENTROPY_BITS: usize = 256;
 		const MAX_CHECKSUM_BITS: usize = 8;
-		
+
 		#[cfg(not(feature = "low_ent"))]
 		const MIN_ENTROPY_BITS: usize = 128;
 
@@ -749,7 +749,7 @@ mod tests {
 		}
 	}
 
-	
+
 	#[test]
 	fn test_vectors_english() {
 		// These vectors are tuples of
@@ -1056,6 +1056,8 @@ mod tests {
 				w, dbg
 			);
 		}
+	}
+
 	#[cfg(feature = "low_ent")]
 	#[test]
 	fn test_invalid_entropy() {
