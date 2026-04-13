@@ -1,0 +1,30 @@
+[package]
+name = "keyshards"
+version = "0.1.0"
+description = "An app utilizing Shamir's Secret Sharing Scheme to allow the secure backup of keys."
+authors = ["Euan Deas"]
+license = "MIT OR Apache-2.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[build-dependencies]
+tauri-build = { version = "1", features = [] }
+
+[dependencies]
+tauri = { version = "1", features = [ "clipboard-write-text", "shell-open", "dialog"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+shami_rs = { git = "https://github.com/euandeas/shami_rs", features = ["experimental"] }
+bip39 = { git = "https://github.com/euandeas/rust-bip39", features = ["all-languages", "low_ent"] }
+base64 = "0.22.0"
+rand_core = { version = "0.6.4", features = ["getrandom"] }
+block-padding = "0.3.3"
+pem-rfc7468 = { version = "0.7.0", features = ["alloc"] }
+opencv = "0.90.0"
+rand = "0.8.5"
+argon2 = "0.5.3"
+
+[features]
+# This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!
+custom-protocol = ["tauri/custom-protocol"]
