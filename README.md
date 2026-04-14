@@ -4,12 +4,11 @@ This repository contains 3 projects that where developed as part of my dissertat
 
 ## Abstract
 
-With the increase in online privacy concerns, comes the need for secure key/password management. Although people are told to physically back up their keys, this is often not done and the risk of losing them is high.
+*With the increase in online privacy concerns, comes the need for secure key/password management. Although people are told to physically back up their keys, this is often not done and the risk of losing them is high.*
 
-This project explores Shamir’s Secret Sharing and its implementations, in order to inform the design and implementation of an application that makes secure key management more accessible. This resulted in a library implementation that provides the core functionality of the secret sharing algorithm, including an authenticated encryption scheme and a BIP-39 mnemonic scheme. An application was also developed to provide a user-friendly interface for the library, allowing users to interact with the secret-sharing algorithm without needing to understand the underlying implementation details or programming. The library and application both include a predefined shares feature, that was developed to allow the user to create shorter memorable shares with secrets of any length.
+*This project explores Shamir’s Secret Sharing and its implementations, in order to inform the design and implementation of an application that makes secure key management more accessible. This resulted in a library implementation that provides the core functionality of the secret sharing algorithm, including an authenticated encryption scheme and a BIP-39 mnemonic scheme. An application was also developed to provide a user-friendly interface for the library, allowing users to interact with the secret-sharing algorithm without needing to understand the underlying implementation details or programming. The library and application both include a predefined shares feature, that was developed to allow the user to create shorter memorable shares with secrets of any length.*
 
-The security of the algorithm, application, and particularly the shorter shares feature was carefully analyzed to ensure that usage of the application would not introduce any risks to secure key management. This determined that with the right education and correct usage, it is likely to not cause any risk, and will greatly benefit the users’ key management. The application was designed to be cross-platform and is open-source-ready, intending to be freely available to use, modify,
-and review.
+*The security of the algorithm, application, and particularly the shorter shares feature was carefully analyzed to ensure that usage of the application would not introduce any risks to secure key management. This determined that with the right education and correct usage, it is likely to not cause any risk, and will greatly benefit the users’ key management. The application was designed to be cross-platform and is open-source-ready, intending to be freely available to use, modify, and review.*
 
 ## Projects
 
