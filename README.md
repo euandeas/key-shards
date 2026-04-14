@@ -1,6 +1,26 @@
-# Key Shards
+<div align="center">
+  <a href="https://github.com/euandeas/key-shards">
+    <img src="key-shards/assets/icon.png" alt="Logo" width="80" height="80">
+  </a>
+
+  <h3 align="center">Key Shards</h3>
+
+  <p align="center">
+    A distributed backup application for secrets, using Shamir's Secret Sharing.
+  </p>
+</div>
+
+## Overview
 
 This repository contains 3 projects that where developed as part of my dissertation project at the University of Nottingham on the topic of "Making Secure Key Management More Accessible Using Secret Sharing". The project was completed in April 2024 and supervised by Dr. Tim Muller. The paper is available upon request, at my sole discretion.
+
+## About
+
+Key Shards is a distributed backup application for private keys, passwords or any other important information. Several shares are produced and only a subset of them are required to reveal the secret.
+
+This program would not be suitable for backing up every password that you use, a password manager is more suited for this job. However, this program is suited for backing up master passwords or the secret key that some services give you (e.g. 1Password or Proton). Other use cases include cryptocurrency wallet keys or succession planning.
+
+Unlike conventional secret sharing, this is not targeted towards distributing a secret among a group, but instead the personal backup of secrets. However, this application can be used for this conventional purpose if you understand what you are doing and the surrounding security risks.
 
 ## Abstract
 

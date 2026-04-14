@@ -12,13 +12,13 @@
 
 # About
 
-Key Shards is a distributed backup application for private keys, passwords or any other important information. Several shares are produced and only a subset of them are required toreveal the secret.
+Key Shards is a distributed backup application for private keys, passwords or any other important information. Several shares are produced and only a subset of them are required to reveal the secret.
 
 This program would not be suitable for backing up every password that you use, a password manager is more suited for this job. However, this program is suited for backing up master passwords or the secret key that some services give you (e.g. 1Password or Proton). Other use cases include cryptocurrency wallet keys or succession planning.
 
 Unlike conventional secret sharing, this is not targeted towards distributing a secret among a group, but instead the personal backup of secrets. However, this application can be used for this conventional purpose if you understand what you are doing and the surrounding security risks.
 
-This is based on an implementation of <a href="https://en.wikipedia.org/wiki/Shamir's_secret_sharing">Shamir's Secret Sharing</a> written in Rust which can be found <a href="https://github.com/euandeas/shami_rs">here</a>.
+This is based on an implementation of <a href="https://en.wikipedia.org/wiki/Shamir's_secret_sharing">Shamir's Secret Sharing</a> written in Rust which can be found [here](../shami_rs/README.md).
 
 ## Features
 
@@ -52,7 +52,7 @@ If you want to build the project yourself you can follow the steps below. This c
 If you do not already have the source code:
 ```
 git clone https://github.com/euandeas/key-shards.git
-cd key-shards
+cd key-shards/key-shards
 ```
 
 Once inside the project directory, to get the program to run:
@@ -84,6 +84,4 @@ at your option.
 
 # Contribution
 
-Unless you explicitly state otherwise, any contribution intentionally submitted
-for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
-dual licensed as above, without any additional terms or conditions.
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.
